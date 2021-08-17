@@ -18,7 +18,7 @@ sh build.sh
 Since you have finished your code build, you will find `kernel.img` inside of build folder.<br>
 What you need to do is
 
-## Download the needed files.
+## Download the needed files
 From https://github.com/raspberrypi/firmware/tree/master/boot , you have to get <br>
  - bootcode.bin
  - start.elf
