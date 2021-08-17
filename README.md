@@ -1,5 +1,6 @@
 # raspi-zero-vvvf
-Making VVVF inverter with raspberry pi zero
+Making VVVF inverter with raspberry pi zero.
+This code is for baremetal on raspberry pi zero.
 
 # requirements
 You need to install cross compiler.<br>
