@@ -40,6 +40,7 @@ arm_freq=1200
 ```
 
 # pin layout
+This number is BCM GPIO number.
  - PIN_U_HIGH 5
  - PIN_U_LOW 19
  - PIN_V_HIGH 6
