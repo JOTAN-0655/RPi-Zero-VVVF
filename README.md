@@ -25,7 +25,7 @@ From https://github.com/raspberrypi/firmware/tree/master/boot , you have to get 
 
 ## SD card
 Now, you need to have some SD card which has more than 2GB.<br>
-Also SD card needs to be formated with FAT32.<br>
+Also the SD card needs to be formated with FAT32.<br>
 <br>
 
 ## Install
@@ -38,6 +38,15 @@ If you want raspberry pi zero to work faster, make `config.txt` and just paste n
 force_turbo=1
 arm_freq=1200
 ```
+
+# pin layout
+ - PIN_U_HIGH 5
+ - PIN_U_LOW 19
+ - PIN_V_HIGH 6
+ - PIN_V_LOW 26
+ - PIN_W_HIGH 13
+ - PIN_W_LOW 21
+
 
 # references
 https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
