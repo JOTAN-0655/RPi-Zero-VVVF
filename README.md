@@ -8,6 +8,7 @@ You need to install cross compiler.<br>
 sudo apt install gcc-arm-none-eabi
 ```
 I don't know why but you have to do this at raspberry pi, otherwise you will fail to build.
+Seems some library doesn't exist when installed on not raspberry pi.
 
 # build
 To build these code, just run
