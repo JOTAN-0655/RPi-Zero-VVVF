@@ -14,5 +14,5 @@ sh build.sh
 ```
 
 # references
-https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
 https://github.com/licux/BareMetalInvaders
