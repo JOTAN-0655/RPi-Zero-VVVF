@@ -51,18 +51,18 @@ double get_saw_value_simple(double x)
 double get_saw_value(double time, double angle_frequency, double initial_phase)
 {
 #ifndef USE_FAST_CALICULATE
-    return asin(sin(time * angle_frequency + initial_phase)) / M_PI * 2;
+    return asin(sin(time * angle_frequency + initial_phase)) / M_PI * 2 + 1;
 #else
-	return get_saw_value_simple(time*angle_frequency+initial_phase);
+	return get_saw_value_simple(time*angle_frequency+initial_phase) + 1;
 #endif
 }
 
 double get_sin_value(double time, double angle_frequency, double initial_phase, double amplitude)
 {
 #ifndef USE_FAST_CALICULATE
-    return sin(time * angle_frequency + initial_phase);
+    return (sin(time * angle_frequency + initial_phase) + 1) * amplitude;
 #else
-	return from_sin_table(time * angle_frequency + initial_phase) * amplitude;
+	return (from_sin_table(time * angle_frequency + initial_phase) + 1) * amplitude;
 #endif
 }
 
@@ -70,17 +70,29 @@ double get_sin_value(double time, double angle_frequency, double initial_phase, 
 double get_pwm_value(double sin_value, double saw_value)
 {
     double diff = round(fabs(sin_value)*1000000)/1000000 - round(fabs(saw_value)*1000000)/1000000;
+	if(diff > 0) return 1;
+	else return -1;
+	/*
     if (diff > 0)
     {
 		if (sin_value < 0) return -1;
 		else return 1;
     }
     else return 0;
+	*/
 }
 
 double mod_d(double a,double b){
 	long div = (long)(a / b);
 	return a - (double)(div * b);
+}
+
+double get_Amplitude(double freq){
+	double max_freq=60,rate=0.4,init=0.6;
+	if(freq > max_freq) return 1.0;
+	if(freq <= 0.1) return 0.0;
+
+	return rate / max_freq * freq + init;
 }
 
 
@@ -107,50 +119,42 @@ void reset_all_variables(){
 	random_freq_move_count=0;
 }
 
-Wave_Values caliculate_E231(char brake,double initial_phase)
+Wave_Values caliculate_E231(bool brake,double initial_phase)
 {
     double sin_freq = sin_angle_freq / 2.0 / M_PI;
 
-    double amplitude;
-    if (sin_freq > 50) amplitude = 1.0;
-    else if(sin_freq < 0.1) amplitude = 0;
-	else amplitude = 0.38 / 50.0 * (sin_freq) + 0.62;
+    double amplitude = get_Amplitude(sin_freq);
 
-    double sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
-    double saw_value, pwm_value,expect_saw_angle_freq;
-    if (sin_freq > 67)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 3;
-		saw_time = sin_time;
-		saw_in_sync_mode = 3;
-    }
-    else if (sin_freq > 60)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 4;
-		saw_time = sin_time;
-		saw_in_sync_mode = 4;
-    }
+    
+    double sin_value,saw_value, pwm_value,expect_saw_angle_freq;
+    if (sin_freq > 67) saw_in_sync_mode = 1;
+    else if (sin_freq > 60) saw_in_sync_mode = 3;
     else if (49 <= sin_freq && sin_freq <= 60)
     {
 		double expect_saw_freq = 710 + (1750 - 710) / 11 * (sin_freq - 49);
-		expect_saw_angle_freq = 2 * M_PI * expect_saw_freq;
+		expect_saw_angle_freq = M_2PI * expect_saw_freq;
 		saw_in_sync_mode = -1;
     }
     else if (23 <= sin_freq && sin_freq < 50)
     {
 		double expect_saw_freq = 1045 + (710 - 1045) / 26 * (sin_freq - 23);
-		expect_saw_angle_freq = 2 * M_PI * expect_saw_freq;
+		expect_saw_angle_freq = M_2PI * expect_saw_freq;
 		saw_in_sync_mode = -1;
     }
     else
     {
-		expect_saw_angle_freq = 1045 * 2 * M_PI;
+		expect_saw_angle_freq = 1045 * M_2PI;
 		saw_in_sync_mode = -1;
     }
 	
 	if(saw_in_sync_mode == -1) saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
+	else{
+		expect_saw_angle_freq = sin_angle_freq * saw_in_sync_mode;
+		saw_time = sin_time;
+	}
 	saw_angle_freq = expect_saw_angle_freq;
 	
+	sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
 	saw_value = get_saw_value(saw_time, saw_angle_freq,initial_phase * ((saw_in_sync_mode>0) ? saw_in_sync_mode : 1));
     pwm_value = get_pwm_value(sin_value, saw_value);
 
@@ -163,57 +167,29 @@ Wave_Values caliculate_E231(char brake,double initial_phase)
 
 }
 
-Wave_Values caliculate_207(char brake,double initial_phase)
+Wave_Values caliculate_207(bool brake,double initial_phase)
 {
     double sin_freq = sin_angle_freq / M_2PI;
 
-    double amplitude;
-    if (sin_freq > 50) amplitude = 1.0;
-    else if(sin_freq < 0.1) amplitude = 0;
-	else amplitude = (double)0.4 / (double)50.0 * (double)sin_freq + (double)0.6;
+    double amplitude = get_Amplitude(sin_freq);
+    
 
-    double saw_value, pwm_value,expect_saw_angle_freq;
-    double sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
-	
-    if (60 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 3;
-		saw_in_sync_mode = 3;
-		saw_time = sin_time;
-    }
-    else if (53 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 4;
-		saw_in_sync_mode = 4;
-		saw_time = sin_time;
-    }
-    else if (44 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 6;
-		saw_in_sync_mode = 6;
-		saw_time = sin_time;
-    }
-    else if (31 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 11;
-		saw_in_sync_mode = 11;
-		saw_time = sin_time;
-    }
-    else if (14 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 16;
-		saw_in_sync_mode = 16;
-		saw_time = sin_time;
-    }
+    double saw_value, pwm_value,expect_saw_angle_freq,sin_value;
+
+    if (60 <= sin_freq) saw_in_sync_mode = 1;
+    else if (53 <= sin_freq) saw_in_sync_mode = 3;
+    else if (44 <= sin_freq) saw_in_sync_mode = 5;
+    else if (31 <= sin_freq) saw_in_sync_mode = 10;
+    else if (14 <= sin_freq) saw_in_sync_mode = 15;
     else if( sin_freq < 14 && !brake)
     {
-		expect_saw_angle_freq = M_PI * 2 * 365;
+		expect_saw_angle_freq = M_2PI * 365;
 		saw_in_sync_mode = -1;
     }else if( 8 < sin_freq && sin_freq < 14 && brake)
     {
 
-		expect_saw_angle_freq = sin_angle_freq * 28;
-		saw_in_sync_mode = 28;
+		expect_saw_angle_freq = sin_angle_freq * 27;
+		saw_in_sync_mode = 27;
 		saw_time = sin_time;
     }
     else
@@ -226,8 +202,13 @@ Wave_Values caliculate_207(char brake,double initial_phase)
     }
 
 	if(saw_in_sync_mode == -1) saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
+	else{
+		expect_saw_angle_freq = sin_angle_freq * saw_in_sync_mode;
+		saw_time = sin_time;
+	}
 	saw_angle_freq = expect_saw_angle_freq;
 		
+	sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
 	saw_value = get_saw_value(saw_time, saw_angle_freq,initial_phase * ((saw_in_sync_mode>0) ? saw_in_sync_mode : 1));
     pwm_value = get_pwm_value(sin_value, saw_value);
 
@@ -239,64 +220,20 @@ Wave_Values caliculate_207(char brake,double initial_phase)
 }
 
 
-Wave_Values caliculate_doremi(char brake,double initial_phase){
-	double sin_freq = sin_angle_freq / 2.0 / M_PI;
+Wave_Values caliculate_doremi(bool brake,double initial_phase){
+	double sin_freq = sin_angle_freq / M_2PI;
 
-    double amplitude;
-    if (sin_freq > 50) amplitude = 1.0;
-    else if(sin_freq < 0.1) amplitude = 0;
-	else amplitude = 0.35 / 50.0 * (sin_freq) + 0.65;
+    double amplitude = get_Amplitude(sin_freq);
 
     double sin_value, saw_value = 0, pwm_value,expect_saw_angle_freq = 0;
-    sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
-    if (80 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 3;
-		saw_in_sync_mode = 3;
-		saw_time = sin_time;
-    }
-    else if (57 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 3;
-		saw_in_sync_mode = 3;
-		saw_time = sin_time;
-    }
-    else if (50 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 4;
-		saw_in_sync_mode = 4;
-		saw_time = sin_time;
-    }
-    else if (43 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 6;
-		saw_in_sync_mode = 6;
-		saw_time = sin_time;
-    }
-    else if (35 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 8;
-		saw_in_sync_mode = 8;
-		saw_time = sin_time;
-    }
-    else if (30 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 13;
-		saw_in_sync_mode = 13;
-		saw_time = sin_time;
-    }
-    else if (27 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 16;
-		saw_in_sync_mode = 16;
-		saw_time = sin_time;
-    }
-    else if (24.5 <= sin_freq)
-    {
-		expect_saw_angle_freq = sin_angle_freq * 19;
-		saw_in_sync_mode = 19;
-		saw_time = sin_time;
-    }
+    if (80 <= sin_freq) saw_in_sync_mode = 1;
+    else if (57 <= sin_freq) saw_in_sync_mode = 3;
+    else if (50 <= sin_freq) saw_in_sync_mode = 3;
+    else if (43 <= sin_freq) saw_in_sync_mode = 5;
+    else if (35 <= sin_freq) saw_in_sync_mode = 7;
+    else if (30 <= sin_freq) saw_in_sync_mode = 12;
+    else if (27 <= sin_freq) saw_in_sync_mode = 15;
+    else if (24.5 <= sin_freq) saw_in_sync_mode = 18;
     else
     {
 		if (!brake)
@@ -366,9 +303,14 @@ Wave_Values caliculate_doremi(char brake,double initial_phase){
 	}
 
 	if(saw_in_sync_mode == -1) saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
+	else{
+		expect_saw_angle_freq = sin_angle_freq * saw_in_sync_mode;
+		saw_time = sin_time;
+	}
 	saw_angle_freq = expect_saw_angle_freq;
-	saw_value = get_saw_value(saw_time, saw_angle_freq, initial_phase * ((saw_in_sync_mode>0) ? saw_in_sync_mode : 1));
 
+	sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
+	saw_value = get_saw_value(saw_time, saw_angle_freq, initial_phase * ((saw_in_sync_mode>0) ? saw_in_sync_mode : 1));
     pwm_value = get_pwm_value(sin_value, saw_value);
 
     Wave_Values wv;
@@ -380,23 +322,20 @@ Wave_Values caliculate_doremi(char brake,double initial_phase){
 
 }
 
-Wave_Values caliculate_E235(char brake,double initial_phase)
+Wave_Values caliculate_E235(bool brake,double initial_phase)
 {
     double sin_freq = sin_angle_freq / M_2PI;
 
-    double amplitude;
-    if (sin_freq > 50) amplitude = 1.0;
-    else if(sin_freq < 0.1) amplitude = 0;
-	else amplitude = 0.4 / 50.0 * (sin_freq) + 0.6;
+    double amplitude = get_Amplitude(sin_freq);
 
     double sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
     double saw_value, pwm_value;
     if (sin_freq > 54)
     {
 		
-		saw_angle_freq = sin_angle_freq * 16;
+		saw_angle_freq = sin_angle_freq * 15;
 		saw_time = sin_time;
-		saw_in_sync_mode = 16;		
+		saw_in_sync_mode = 15;		
 		
 		saw_value = get_saw_value(saw_time, saw_angle_freq,initial_phase * ((saw_in_sync_mode>0) ? saw_in_sync_mode : 1));
 		
@@ -433,14 +372,57 @@ Wave_Values caliculate_E235(char brake,double initial_phase)
     return wv;
 }
 
-Wave_Values caliculate_silent(char brake,double initial_phase)
+Wave_Values caliculate_E209(bool brake, double initial_phase)
+{
+    double sin_freq = sin_angle_freq / M_2PI;
+    double amplitude = get_Amplitude(sin_freq);
+
+    double sin_value, saw_value, pwm_value, expect_saw_angle_freq;
+
+    if (53 <= sin_freq) saw_in_sync_mode = 1;
+    else if (46 <= sin_freq) saw_in_sync_mode = 3;
+    else if (30 <= sin_freq) saw_in_sync_mode = 9;
+    else if (19 <= sin_freq) saw_in_sync_mode = 21;
+    else if (9 <= sin_freq) saw_in_sync_mode = 33;
+    else if (2 <= sin_freq && !brake) saw_in_sync_mode = 57;
+    else if (sin_freq < 2 && !brake)
+    {
+		saw_in_sync_mode = -1;
+		expect_saw_angle_freq = M_2PI * 114;
+    }
+    else if (8 < sin_freq && sin_freq < 18 && brake) saw_in_sync_mode = 33;
+    else
+    {	
+		Wave_Values wv;
+		wv.sin_value = 0;
+		wv.saw_value = 0;
+		wv.pwm_value = 0;
+		return wv;
+    }
+
+    if (saw_in_sync_mode == -1) saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
+	else{
+		expect_saw_angle_freq = sin_angle_freq * saw_in_sync_mode;
+		saw_time = sin_time;
+	}
+    saw_angle_freq = expect_saw_angle_freq;
+
+	sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
+    saw_value = get_saw_value(saw_time, saw_angle_freq, initial_phase * ((saw_in_sync_mode > 0) ? saw_in_sync_mode : 1));
+    pwm_value = get_pwm_value(sin_value, saw_value);
+
+	Wave_Values wv;
+    wv.sin_value = sin_value;
+    wv.saw_value = saw_value;
+    wv.pwm_value = pwm_value;
+    return wv;
+}
+
+Wave_Values caliculate_silent(bool brake,double initial_phase)
 {
     double sin_freq = sin_angle_freq / M_2PI;
 
-    double amplitude;
-    if (sin_freq > 50) amplitude = 1.0;
-    else if(sin_freq < 0.1) amplitude = 0;
-	else amplitude = 0.4 / 50.0 * (sin_freq) + 0.6;
+    double amplitude = get_Amplitude(sin_freq);
 
     double sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
     double saw_value, pwm_value;

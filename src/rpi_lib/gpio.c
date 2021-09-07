@@ -18,6 +18,7 @@ void InitializeGpio(void){
 	// diable pullup/down all
 	*GPPUD 	= 0x00;
 	// wait 150 cycle
+
 	for(i=0;i<150;i++){
 		// nop
 		asm("mov r0,r0");
@@ -176,4 +177,71 @@ int digitalRead(unsigned int pin)
 	return LOW;
 }
 
+void setFallDetect(unsigned int pin,bool set,bool async){
+	volatile unsigned int* addr;
+	if(pin < 0 || pin > 53) return;
+	if(async==true){
+		if(pin <= 31) addr = GPAFEN0;
+		else addr = GPAFEN1;
+	}else{
+		if(pin <= 31) addr = GPFEN0;
+		else addr = GPFEN1;
+	}
+	if(set==true) *addr |= (long)1<<(pin%32);
+	else *addr &= ~((long)1<<(pin%32));
+}
 
+void setRaiseDetect(unsigned int pin,bool set,bool async){
+	volatile unsigned int* addr;
+	if(pin < 0 || pin > 53) return;
+	if(async==true){
+		if(pin <= 31) addr = GPAREN0;
+		else addr = GPAREN1;
+	}else{
+		if(pin <= 31) addr = GPREN0;
+		else addr = GPREN1;
+	}
+	if(set==true) *addr |= (long)1<<(pin%32);
+	else *addr &= ~((long)1<<(pin%32));
+}
+
+void setLowDetect(unsigned int pin,bool set){
+	volatile unsigned int* addr;
+	if(pin < 0 || pin > 53) return;
+	else if(pin <= 31) addr = GPLEN0;
+	else addr = GPLEN1;
+	if(set==true) *addr |= (long)1<<(pin%32);
+	else *addr &= ~((long)1<<(pin%32));
+}
+
+void setHighDetect(unsigned int pin,bool set){
+	volatile unsigned int* addr;
+	if(pin < 0 || pin > 53) return;
+	else if(pin <= 31) addr = GPHEN0;
+	else addr = GPHEN1;
+	if(set==true) *addr |= (long)1<<(pin%32);
+	else *addr &= ~((long)1<<(pin%32));
+}
+
+int isEventDetect(unsigned int pin){
+	volatile unsigned int* addr;
+	volatile unsigned int mask;
+	if(pin < 0 || pin > 53) return -1;
+	else if(pin <= 31) addr = GPEDS0;
+	else addr = GPEDS1;
+	mask = 1 << (pin % 32);
+	unsigned long status = (*addr & mask);
+	
+	if(status!=0) {
+		*addr |= (long)1 << (pin%32);
+		return HIGH;
+	}
+	else return LOW;
+}
+void clearEventDetect(unsigned int pin){
+	volatile unsigned int* addr;
+	if(pin < 0 || pin > 53) return;
+	else if(pin <= 31) addr = GPEDS0;
+	else addr = GPEDS1;
+	*addr |= (long)1 << (pin%32);
+}

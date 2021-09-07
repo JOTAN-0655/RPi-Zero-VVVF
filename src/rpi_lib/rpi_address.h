@@ -21,6 +21,29 @@
 #define GPLEV0	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x34))
 #define GPLEV1	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x38))
 
+#define GPREN0  ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x4C))
+#define GPREN1  ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x50))
+
+#define GPFEN0  ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x58))
+#define GPFEN1  ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x5C))
+
+#define GPHEN0  ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x64))
+#define GPHEN1  ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x68))
+
+#define GPLEN0	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x70))
+#define GPLEN1	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x74))
+
+#define GPAREN0 ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x7C))
+#define GPAREN1 ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x80))
+
+#define GPAFEN0 ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x88))
+#define GPAFEN1 ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x8C))
+
+
+
+#define GPEDS0 ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x40))
+#define GPEDS1 ((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x44))
+
 #define GPPUD	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x94))
 #define GPPUDCKL0	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x98))
 #define GPPUDCKL1	((volatile unsigned int*)PERI_ADDR(GPIO_ADDRESS_BASE + 0x9C))

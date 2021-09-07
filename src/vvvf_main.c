@@ -22,9 +22,14 @@
 #define PIN_W_HIGH 13
 #define PIN_W_LOW 21
 
-#define HANDLE_BIT_0 17
-#define HANDLE_BIT_1 27
-#define HANDLE_BIT_2 22
+#define mascon_1 4
+#define mascon_2 17
+#define mascon_3 27
+#define mascon_4 22
+
+#define button_R 1
+#define button_SEL 7
+#define button_L 8
 
 #define LED_PIN 47
 
@@ -59,15 +64,71 @@ void initialize_vvvf_pin(){
 	pinMode(PIN_U_LOW, OUTPUT);
 	pinMode(PIN_V_LOW, OUTPUT);
 	pinMode(PIN_W_LOW, OUTPUT);
+	
+	pinMode(mascon_1, INPUT);
+	pinMode(mascon_2, INPUT);
+	pinMode(mascon_3, INPUT);
+	pinMode(mascon_4, INPUT);
+
+	pinMode(button_R, INPUT);
+	pinMode(button_SEL, INPUT);
+	pinMode(button_L, INPUT);
+
+	setFallDetect(button_R, true, false);
+	setFallDetect(button_SEL, true, false);
+	setFallDetect(button_L, true, false);
+	
 	all_off();
 }
 
+int get_Mascon_status(){
+	int bit1 = digitalRead(mascon_1);
+	int bit2 = digitalRead(mascon_2);
+	int bit3 = digitalRead(mascon_3);
+	int bit4 = digitalRead(mascon_4);
+
+	int status = bit1 | bit2<<1 | bit3<<2 | bit4<<3;
+	return status;
+}
+
 char ignore_pin_change = 0;
+int pre_phase_0_stat = 0,pre_phase_1_stat = 0,pre_phase_2_stat = 0;
+int get_phase_stat(char phase){
+	if(phase == 0) return pre_phase_0_stat;
+	else if(phase == 1) return pre_phase_1_stat;
+	else return pre_phase_2_stat;
+}
+void set_phase_stat(char phase,int stat){
+	if(phase == 0) pre_phase_0_stat = stat;
+	else if(phase == 1) pre_phase_1_stat = stat;
+	else pre_phase_2_stat = stat;
+}
+
 // stat = 1 => pin_H = 1,pin_L=0
 // stat = 0 => pin_H = 0,pin_L=0
 // stat = -1 => pin_H = 0,pin_L=1
-void set_phase(char pin_H,char pin_L,int stat){
+void set_phase(char phase,int stat){
 	if(ignore_pin_change == 1) return;
+	
+	char pin_H,pin_L;
+	switch(phase){
+		case 0:
+			pin_H = PIN_U_HIGH;
+			pin_L = PIN_U_LOW;
+			break;
+		case 1:
+			pin_H = PIN_V_HIGH;
+			pin_L = PIN_V_LOW;
+			break;
+		default:
+			pin_H = PIN_W_HIGH;
+			pin_L = PIN_W_LOW;
+			break;
+	}
+	
+	if(get_phase_stat(phase) == stat) return;
+	set_phase_stat(phase,stat);
+	
 	digitalWrite(pin_H, LOW);
 	digitalWrite(pin_L, LOW);
 	delay_us(1);
@@ -86,23 +147,13 @@ void set_phase(char pin_H,char pin_L,int stat){
 	}
 }
 
-char get_pin_num_H(char n){
-	if(n == 0) return PIN_U_HIGH;
-	else if(n == 1) return PIN_V_HIGH;
-	else return PIN_W_HIGH;
-}
-char get_pin_num_L(char n){
-	if(n == 0) return PIN_U_LOW;
-	else if(n == 1) return PIN_V_LOW;
-	else return PIN_W_LOW;
-}
-
-Wave_Values get_Value_mode(int mode,char brake,double initial_phase){
+Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	Wave_Values wv;
 	if(mode == 0)wv = caliculate_207(brake,initial_phase);
 	else if(mode == 1) wv = caliculate_E231(brake,initial_phase);
 	else if(mode == 2) wv = caliculate_doremi(brake,initial_phase);
 	else if(mode == 3) wv = caliculate_E235(brake,initial_phase);
+	else if(mode == 4) wv = caliculate_E209(brake,initial_phase);
 	else wv = caliculate_silent(brake,initial_phase);
 	
 	return wv;
@@ -111,11 +162,15 @@ Wave_Values get_Value_mode(int mode,char brake,double initial_phase){
 long count = 0;
 char do_frequency_change = 1,update_pin = 1;
 int pin_run(int mode){
-	int return_val = 1;
-	reset_all_variables();
-	char brake = 0;
+	int return_val = 0;
+	bool brake = false;
 	unsigned long long start_system_time = 0,end_targer_system_time = 0;
 	led_high();
+
+	clearEventDetect(button_R);
+	clearEventDetect(button_L);
+	clearEventDetect(button_SEL);
+
 	while (1)
     {
 		start_system_time = get_systime();
@@ -128,30 +183,62 @@ int pin_run(int mode){
 			if(!update_pin) continue;
 			double initial_phase = (double)2.094395102393195 * (double)i;
 			Wave_Values wv = get_Value_mode(mode,brake,initial_phase);
-			char H_PIN = get_pin_num_H(i);
-			char L_PIN = get_pin_num_L(i);
-			set_phase(H_PIN,L_PIN,(int)wv.pwm_value);
+			int require_stat = (int)wv.pwm_value;
+			set_phase(i,require_stat);
 		}
 
 		count++;
 		if (count % 8 == 0 && do_frequency_change)
 		{
 			double sin_new_angle_freq = sin_angle_freq;
-			if(!brake) sin_new_angle_freq += M_PI / 500.0;
-			else sin_new_angle_freq -= M_PI / 500.0;
-			double amp = sin_angle_freq / sin_new_angle_freq;
-			sin_angle_freq = sin_new_angle_freq;
-			sin_time = amp * sin_time;
+
+			if(get_Mascon_status()-4 > 0){
+				sin_new_angle_freq += M_PI / 1000.0 * (get_Mascon_status() - 4) ;
+				brake = false;
+			}else if(get_Mascon_status() - 4 < 0){
+				sin_new_angle_freq -= M_PI / 1000.0 * (4-get_Mascon_status());
+				brake = true;
+			}
+			
+			if(sin_new_angle_freq > 300.0 * M_PI) sin_new_angle_freq = 300.0 * M_PI;
+			
+			if(sin_new_angle_freq <= 0){
+				sin_time = 0;
+				saw_time = 0;
+				sin_angle_freq = 0;
+			}else{
+				double amp = sin_angle_freq / sin_new_angle_freq;
+				sin_angle_freq = sin_new_angle_freq;
+				sin_time = amp * sin_time;
+			}
+			
+			
 		}
+
+		if(isEventDetect(button_R)==1 && sin_angle_freq == 0){
+			return_val=1;
+			break;
+		}else if(isEventDetect(button_L)==1 && sin_angle_freq == 0){
+			return_val=-1;
+			break;
+		}else if(isEventDetect(button_SEL)==1){
+			return_val = 0;
+			break;
+		}
+		/*
+		if(digitalRead(button_R)==0){
+			return_val = 1;
+			break;
+		}else if(digitalRead(button_L)==0){
+			return_val = -1;
+			break;
+		}else if(digitalRead(button_SEL)==0){
+			break;
+		}
+		*/
 		
-		if(sin_angle_freq / 6.283185307179586 > 150 && !brake && do_frequency_change){
-			do_frequency_change = 0;
-			count = 0;
-		}else if(count / 31250 == 2 && !do_frequency_change){
-			do_frequency_change = 1;
-			brake = 1;
-		}else if(sin_angle_freq / 6.283185307179586 < 0 && brake && do_frequency_change) break;
 		while(end_targer_system_time > get_systime());
+		
     }
 	led_low();
     all_off();
@@ -166,19 +253,25 @@ int main ( void )
 	led_high();
 	initialize_vvvf_pin();
 	generate_sin_table();
+	reset_all_variables();
 	srand(0);
 	led_low();
 
-	for(int x = 0; x < 4;x++){
-		pin_run(x);
+	int mode = 0;
+	while(1){
+		int change = pin_run(mode);
+		if(change==0) break;
+		delay_ms(500);
+		mode+=change;
+		if(mode < 0) mode = 4;
+		else if(mode > 4) mode = 0;
 	}
-	
 	
 	
 	while(1) {
 
 		led_toggle();
-		delay_ms(500);
+		delay_ms(100);
 
 	}
     return(0);

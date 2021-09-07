@@ -21,11 +21,20 @@
 #define PULLDOWN	8
 #define PULLUP		9
 
+typedef enum { false, true } bool;
+
 extern void wait_150();
 extern void InitializeGpio();
 extern void setPullUpDown(unsigned int pin, unsigned int mode);
 extern void pinMode(unsigned int pin, unsigned int type);
 extern void digitalWrite(unsigned int pin, unsigned int value);
 extern int digitalRead(unsigned int pin);
+
+void setFallDetect(unsigned int pin,bool set,bool async);
+void setRaiseDetect(unsigned int pin,bool set,bool async);
+void setLowDetect(unsigned int pin,bool set);
+void setHighDetect(unsigned int pin,bool set);
+int isEventDetect(unsigned int pin);
+void clearEventDetect(unsigned int pin);
 
 #endif
