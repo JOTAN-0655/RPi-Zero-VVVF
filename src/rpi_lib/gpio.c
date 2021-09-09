@@ -144,7 +144,7 @@ void digitalWrite(unsigned int pin, unsigned int value)
 		}else{
 			addr = GPSET1;
 		}
-	}else if(value == LOW){
+	}else{
 		if(pin < 0 || pin > 53){
 			return ;
 		}else if(pin <= 31){

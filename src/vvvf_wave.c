@@ -174,7 +174,7 @@ Wave_Values caliculate_E231(bool brake,double initial_phase)
 {
     double sin_freq = sin_angle_freq / 2.0 / M_PI;
     double amplitude = get_Amplitude(sin_freq,67);
-    double expect_saw_angle_freq;
+    double expect_saw_angle_freq=0;
 	Pulse_Mode pulse_mode;
     if (sin_freq > 67) pulse_mode = P_1;
     else if (sin_freq > 60) pulse_mode = P_Wide_3;
@@ -208,7 +208,7 @@ Wave_Values caliculate_207(bool brake,double initial_phase)
     double amplitude = get_Amplitude(sin_freq,60);
     
 
-    double expect_saw_angle_freq;
+    double expect_saw_angle_freq=0;
 	Pulse_Mode pulse_mode;
     if (60 <= sin_freq) pulse_mode = P_1;
     else if (53 <= sin_freq) pulse_mode = P_3;
