@@ -88,7 +88,7 @@ Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_pha
     double saw = get_saw_value(time, angle_frequency, initial_phase) - 1;
     double pwm = ((sin - saw > 0) ? 1 : -1) * voltage;
     double nega_saw = (saw > 0) ? saw - 1 : saw + 1;
-    double gate = (pwm - nega_saw > 0) ? 1 : 0;
+    double gate = (pwm - nega_saw > 0) ? 1 : -1;
 	Wave_Values wv;
     wv.sin_value = pwm;
     wv.saw_value = nega_saw;
@@ -173,7 +173,7 @@ Wave_Values caliculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq
 Wave_Values caliculate_E231(bool brake,double initial_phase)
 {
     double sin_freq = sin_angle_freq / 2.0 / M_PI;
-    double amplitude = get_Amplitude(sin_freq,67);
+    double amplitude = get_Amplitude(sin_freq,65);
     double expect_saw_angle_freq=0;
 	Pulse_Mode pulse_mode;
     if (sin_freq > 67) pulse_mode = P_1;
@@ -241,7 +241,7 @@ Wave_Values caliculate_207(bool brake,double initial_phase)
 Wave_Values caliculate_doremi(bool brake,double initial_phase){
 	double sin_freq = sin_angle_freq / M_2PI;
 
-    double amplitude = get_Amplitude(sin_freq,57);
+    double amplitude = get_Amplitude(sin_freq,80);
 
     double expect_saw_angle_freq = 0;
 	Pulse_Mode pulse_mode;
