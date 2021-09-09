@@ -74,9 +74,9 @@ void initialize_vvvf_pin(){
 	pinMode(button_SEL, INPUT);
 	pinMode(button_L, INPUT);
 
-	setFallDetect(button_R, true, false);
-	setFallDetect(button_SEL, true, false);
-	setFallDetect(button_L, true, false);
+	//setRaiseDetect(button_R, true,false);
+	//setRaiseDetect(button_SEL, true,false);
+	//setRaiseDetect(button_L, true,false);
 	
 	all_off();
 }
@@ -215,6 +215,8 @@ int pin_run(int mode){
 			
 		}
 
+		//Event works worse when noise is high.
+		/* 
 		if(isEventDetect(button_R)==1 && sin_angle_freq == 0){
 			return_val=1;
 			break;
@@ -225,17 +227,18 @@ int pin_run(int mode){
 			return_val = 0;
 			break;
 		}
-		/*
-		if(digitalRead(button_R)==0){
+		*/
+		
+		if(digitalRead(button_R)==0  && sin_angle_freq == 0){
 			return_val = 1;
 			break;
-		}else if(digitalRead(button_L)==0){
+		}else if(digitalRead(button_L)==0  && sin_angle_freq == 0){
 			return_val = -1;
 			break;
 		}else if(digitalRead(button_SEL)==0){
 			break;
 		}
-		*/
+		
 		
 		while(end_targer_system_time > get_systime());
 		
