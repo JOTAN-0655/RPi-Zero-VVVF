@@ -2,6 +2,15 @@
 Making VVVF inverter with raspberry pi zero.
 This code is for baremetal on raspberry pi zero.
 
+# disclaimer
+PLEASE DO EVERYTHING BY YOUR OWN RESPONSIBILITY.<br>
+MAY CAUSE YOU A BIG DAMAGE WITH ELECTRONIC.<br>
+THIS VVVF CODE IS NOT MADE BY ENGINIEER OR ANY PROFESSIONAL.<br>
+
+# references
+https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
+https://github.com/licux/BareMetalInvaders (I borrowed some cord from here.)
+
 # requirements
 You need to install cross compiler.<br>
 ```
@@ -49,8 +58,3 @@ This number is BCM GPIO number.
  - PIN_V_LOW 26
  - PIN_W_HIGH 13
  - PIN_W_LOW 21
-
-
-# references
-https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
-https://github.com/licux/BareMetalInvaders
