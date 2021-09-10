@@ -5,7 +5,7 @@ This code is for baremetal on raspberry pi zero.
 # disclaimer
 PLEASE DO EVERYTHING BY YOUR OWN RESPONSIBILITY.<br>
 MAY CAUSE YOU A BIG DAMAGE WITH ELECTRONIC.<br>
-THIS VVVF CODE IS NOT MADE BY ENGINIEER OR ANY PROFESSIONAL.<br>
+THIS VVVF CODE IS NOT MADE BY ENGINEER OR ANY PROFESSIONAL.<br>
 
 # references
 https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
