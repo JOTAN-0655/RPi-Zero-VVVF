@@ -159,8 +159,9 @@ Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	return wv;
 }
 
-long count = 0;
+char count = 0;
 char do_frequency_change = 1,update_pin = 1;
+unsigned int button_press_count = 0;
 int pin_run(int mode){
 	int return_val = 0;
 	bool brake = false;
@@ -190,6 +191,7 @@ int pin_run(int mode){
 		count++;
 		if (count % 8 == 0 && do_frequency_change)
 		{
+			count=0;
 			double sin_new_angle_freq = sin_angle_freq;
 
 			if(get_Mascon_status()-4 > 0){
@@ -206,7 +208,10 @@ int pin_run(int mode){
 				sin_time = 0;
 				saw_time = 0;
 				sin_angle_freq = 0;
+				disconnect = true;
+				all_off();
 			}else{
+				disconnect = false;
 				double amp = sin_angle_freq / sin_new_angle_freq;
 				sin_angle_freq = sin_new_angle_freq;
 				sin_time = amp * sin_time;
@@ -230,13 +235,25 @@ int pin_run(int mode){
 		*/
 		
 		if(digitalRead(button_R)==0  && sin_angle_freq == 0){
-			return_val = 1;
-			break;
+			if(button_press_count==1000){
+				button_press_count=0;
+				return_val = 1;
+				break;
+			}else button_press_count++;
+			
 		}else if(digitalRead(button_L)==0  && sin_angle_freq == 0){
-			return_val = -1;
-			break;
+			if(button_press_count==1000){
+				button_press_count=0;
+				return_val = -1;
+				break;
+			}else button_press_count++;
 		}else if(digitalRead(button_SEL)==0){
-			break;
+			if(button_press_count==1000){
+				button_press_count=0;
+				break;
+			}else button_press_count++;
+		}else{
+			button_press_count=0;
 		}
 		
 		

@@ -18,6 +18,7 @@ typedef enum {
 
 void generate_sin_table();
 void test_sin_table();
+double mod_d(double a,double b);
 
 double from_sin_table(double radian);
 double get_saw_value_simple(double x);
@@ -25,14 +26,11 @@ double get_saw_value_simple(double x);
 double get_saw_value(double time, double angle_frequency, double initial_phase);
 double get_sin_value(double time, double angle_frequency, double initial_phase, double amplitude);
 double get_pwm_value(double sin_value, double saw_value);
-Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage);
 
-double mod_d(double a,double b);
+
 double get_Amplitude(double freq,double max_freq);
-double get_Saw_Initial(Pulse_Mode mode);
-
-
-
+Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage,double carrier_mul);
+Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage);
 int get_Pulse_Num(Pulse_Mode mode);
 
 //sin value definitions
@@ -40,6 +38,8 @@ extern double sin_angle_freq,sin_time;
 
 //saw value definitions
 extern double saw_angle_freq,saw_time;
+
+extern bool disconnect;
 
 extern int random_freq_move_count;
 

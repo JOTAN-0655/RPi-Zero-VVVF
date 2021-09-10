@@ -31,6 +31,11 @@ void test_sin_table(){
 	}
 }
 
+double mod_d(double a,double b){
+	long div = (long)(a / b);
+	return a - (double)(div * b);
+}
+
 double from_sin_table(double radian){
 	long cycles = 0;
 	if(radian > M_PI) cycles = (long)(radian / M_PI);
@@ -51,9 +56,9 @@ double get_saw_value_simple(double x)
 double get_saw_value(double time, double angle_frequency, double initial_phase)
 {
 #ifndef USE_FAST_CALICULATE
-    return -asin(sin(time * angle_frequency + initial_phase)) / M_PI * 2 + 1;
+    return -asin(sin(time * angle_frequency + initial_phase)) / M_PI * 2;
 #else
-	return -get_saw_value_simple(time*angle_frequency+initial_phase) + 1;
+	return -get_saw_value_simple(time*angle_frequency+initial_phase);
 #endif
 }
 
@@ -62,33 +67,26 @@ double get_sin_value(double time, double angle_frequency, double initial_phase, 
 #ifndef USE_FAST_CALICULATE
     return (sin(time * angle_frequency + initial_phase) + 1) * amplitude;
 #else
-	return (from_sin_table(time * angle_frequency + initial_phase)) * amplitude+1;
+	return (from_sin_table(time * angle_frequency + initial_phase)) * amplitude;
 #endif
 }
 
 
 double get_pwm_value(double sin_value, double saw_value)
 {
-    double diff = round(fabs(sin_value)*1000000)/1000000 - round(fabs(saw_value)*1000000)/1000000;
-	if(diff > 0) return 1;
+	if(disconnect) return 0;
+	if(sin_value - saw_value > 0) return 1;
 	else return -1;
-	/*
-    if (diff > 0)
-    {
-		if (sin_value < 0) return -1;
-		else return 1;
-    }
-    else return 0;
-	*/
 }
+
 
 Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage)
 {
-    double sin = get_sin_value(time, angle_frequency, initial_phase, 1)-1;
-    double saw = get_saw_value(time, angle_frequency, initial_phase) - 1;
+    double sin = get_sin_value(time, angle_frequency, initial_phase, 1);
+    double saw = get_saw_value(time, angle_frequency, initial_phase);
     double pwm = ((sin - saw > 0) ? 1 : -1) * voltage;
     double nega_saw = (saw > 0) ? saw - 1 : saw + 1;
-    double gate = (pwm - nega_saw > 0) ? 1 : -1;
+    double gate = get_pwm_value(pwm, nega_saw);
 	Wave_Values wv;
     wv.sin_value = pwm;
     wv.saw_value = nega_saw;
@@ -96,13 +94,21 @@ Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_pha
     return wv;
 }
 
-double mod_d(double a,double b){
-	long div = (long)(a / b);
-	return a - (double)(div * b);
+Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage,double carrier_mul)
+{
+    double carrier_saw = -get_saw_value(time, carrier_mul * sin_angle_frequency, carrier_mul * initial_phase);
+    double saw = -get_saw_value(time, sin_angle_frequency, initial_phase);
+    double pwm = (saw > 0) ? voltage : -voltage;
+	double gate = get_pwm_value(pwm, carrier_saw);
+	Wave_Values wv;
+    wv.sin_value = saw;
+    wv.saw_value = carrier_saw;
+   	wv.pwm_value = gate;
+    return wv;
 }
 
 double get_Amplitude(double freq,double max_freq){
-	double rate=0.95,init=0.05;
+	double rate=0.98,init=0.02;
 	if(freq > max_freq) return 1.0;
 	if(freq <= 0.1) return 0.0;
 
@@ -114,19 +120,14 @@ int get_Pulse_Num(Pulse_Mode mode)
     if (mode == Not_In_Sync) return -1;
     if (mode == P_1) return 0;
     if (mode == P_Wide_3) return 0;
+	if (mode == P_5) return 6;
+    if (mode == P_7) return 9;
     if (mode == P_10) return 10;
 	if (mode == P_12) return 12;
 	if (mode == P_18) return 18;
     return 3 + (2 * ((int)mode - 6));
 } 
 
-double get_Saw_Initial(Pulse_Mode mode)
-{
-    if (mode == P_5) return -1.05;
-    if (mode == P_7) return 1;
-    if (mode == P_9) return M_PI;
-    return 0;
-}
 //sin value definitions
 double sin_angle_freq = 0;
 double sin_time = 0;
@@ -134,6 +135,8 @@ double sin_time = 0;
 //saw value definitions
 double saw_angle_freq = 1050;
 double saw_time = 0;
+
+bool disconnect = false;
 
 int random_freq_move_count = 0;
 
@@ -149,10 +152,12 @@ void reset_all_variables(){
 }
 
 Wave_Values caliculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude){
+
+	if (pulse_mode == P_Wide_3) return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude);
+	if (pulse_mode == P_5) return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode));
+    if (pulse_mode == P_7) return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode));
+
 	if(pulse_mode == Not_In_Sync) saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
-	else if(pulse_mode == P_Wide_3){
-		return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude);
-	}
 	else{
 		expect_saw_angle_freq = sin_angle_freq * get_Pulse_Num(pulse_mode);
 		saw_time = sin_time;
