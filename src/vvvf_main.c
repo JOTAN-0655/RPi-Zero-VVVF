@@ -154,6 +154,7 @@ Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	else if(mode == 2) wv = caliculate_doremi(brake,initial_phase);
 	else if(mode == 3) wv = caliculate_E235(brake,initial_phase);
 	else if(mode == 4) wv = caliculate_E209(brake,initial_phase);
+	else if(mode == 5) wv = caliculate_9820(brake,initial_phase);
 	else wv = caliculate_silent(brake,initial_phase);
 	
 	return wv;
@@ -278,13 +279,14 @@ int main ( void )
 	led_low();
 
 	int mode = 0;
+	char total_mode = 5;
 	while(1){
 		int change = pin_run(mode);
 		if(change==0) break;
 		delay_ms(500);
 		mode+=change;
-		if(mode < 0) mode = 4;
-		else if(mode > 4) mode = 0;
+		if(mode < 0) mode = total_mode;
+		else if(mode > total_mode) mode = 0;
 	}
 	
 	

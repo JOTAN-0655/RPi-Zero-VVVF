@@ -51,4 +51,5 @@ Wave_Values caliculate_207(bool brake,double initial_phase);
 Wave_Values caliculate_doremi(bool brake,double initial_phase);
 Wave_Values caliculate_E235(bool brake,double initial_phase);
 Wave_Values caliculate_E209(bool brake,double initial_phase);
+Wave_Values caliculate_9820(bool brake, double initial_phase);
 Wave_Values caliculate_silent(bool brake,double initial_phase);
