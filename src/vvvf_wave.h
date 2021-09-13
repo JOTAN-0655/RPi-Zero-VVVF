@@ -1,4 +1,4 @@
-#define USE_FAST_CALICULATE
+#define USE_FAST_CALCULATE
 
 #include "rpi_lib/gpio.h"
 
@@ -45,11 +45,13 @@ extern int random_freq_move_count;
 
 void reset_all_variables();
 
-Wave_Values caliculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
-Wave_Values caliculate_E231(bool brake,double initial_phase);
-Wave_Values caliculate_207(bool brake,double initial_phase);
-Wave_Values caliculate_doremi(bool brake,double initial_phase);
-Wave_Values caliculate_E235(bool brake,double initial_phase);
-Wave_Values caliculate_E209(bool brake,double initial_phase);
-Wave_Values caliculate_9820(bool brake, double initial_phase);
-Wave_Values caliculate_silent(bool brake,double initial_phase);
+Wave_Values calculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
+Wave_Values calculate_E231(bool brake,double initial_phase);
+Wave_Values calculate_207(bool brake,double initial_phase);
+Wave_Values calculate_doremi(bool brake,double initial_phase);
+Wave_Values calculate_E235(bool brake,double initial_phase);
+Wave_Values calculate_E209(bool brake,double initial_phase);
+Wave_Values calculate_9820_mitsubishi(bool brake, double initial_phase);
+Wave_Values calculate_9820_hitachi(bool brake, double initial_phase);
+Wave_Values calculate_E233(bool brake, double initial_phase);
+Wave_Values calculate_silent(bool brake,double initial_phase);

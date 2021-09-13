@@ -149,13 +149,15 @@ void set_phase(char phase,int stat){
 
 Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	Wave_Values wv;
-	if(mode == 0)wv = caliculate_207(brake,initial_phase);
-	else if(mode == 1) wv = caliculate_E231(brake,initial_phase);
-	else if(mode == 2) wv = caliculate_doremi(brake,initial_phase);
-	else if(mode == 3) wv = caliculate_E235(brake,initial_phase);
-	else if(mode == 4) wv = caliculate_E209(brake,initial_phase);
-	else if(mode == 5) wv = caliculate_9820(brake,initial_phase);
-	else wv = caliculate_silent(brake,initial_phase);
+	if(mode == 0)wv = calculate_207(brake,initial_phase);
+	else if(mode == 1) wv = calculate_E231(brake,initial_phase);
+	else if(mode == 2) wv = calculate_doremi(brake,initial_phase);
+	else if(mode == 3) wv = calculate_E235(brake,initial_phase);
+	else if(mode == 4) wv = calculate_E209(brake,initial_phase);
+	else if(mode == 5) wv = calculate_9820_mitsubishi(brake,initial_phase);
+	else if(mode == 6) wv = calculate_9820_hitachi(brake,initial_phase);
+	else if(mode == 7) wv = calculate_E233(brake,initial_phase);
+	else wv = calculate_silent(brake,initial_phase);
 	
 	return wv;
 }
@@ -279,7 +281,7 @@ int main ( void )
 	led_low();
 
 	int mode = 0;
-	char total_mode = 5;
+	char total_mode = 7;
 	while(1){
 		int change = pin_run(mode);
 		if(change==0) break;
