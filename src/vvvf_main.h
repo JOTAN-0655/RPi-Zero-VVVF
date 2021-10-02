@@ -13,6 +13,8 @@ int get_Mascon_status();
 // stat = -1 => pin_H = 0,pin_L=1
 int get_phase_stat(char phase);
 void set_phase_stat(char phase,int stat);
+char get_pin_H(char phase);
+char get_pin_L(char phase);
 void set_phase(char phase,int stat);
 
 Wave_Values get_Value_mode(int mode,bool brake,double initial_phase);

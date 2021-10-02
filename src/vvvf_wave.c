@@ -1,11 +1,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "rpi_lib/delay.h"
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
-
-#include "rpi_lib/uart.h"
 
 #define M_2PI 6.28318530717958
 
@@ -24,15 +21,6 @@ void generate_sin_table()
 		sin_table[i] = val;
 	}
 #endif
-}
-
-void test_sin_table()
-{
-	for (int i = 0; i < 1999; i++)
-	{
-		UartPut_I((int)(sin_table[i] * 1000000), 7);
-		delay_ms(80);
-	}
 }
 
 double mod_d(double a, double b)
@@ -129,7 +117,6 @@ double get_Amplitude(double freq, double max_freq)
 		return 0.0;
 
 	return rate / max_freq * freq + init;
-
 }
 
 int get_Pulse_Num(Pulse_Mode mode)
@@ -490,7 +477,7 @@ Wave_Values calculate_9820_mitsubishi(bool brake, double initial_phase)
 	}
 	else if (sin_freq > 1)
 	{
-		double expect_saw_freq = 250 + (700 - 250) / 13 * sin_freq;
+		double expect_saw_freq = 250 + (700 - 250) / 12 * (sin_freq - 1);
 		expect_saw_angle_freq = M_2PI * expect_saw_freq;
 		pulse_Mode = Not_In_Sync;
 	}
@@ -596,6 +583,52 @@ Wave_Values calculate_silent(bool brake, double initial_phase)
 		random_freq_move_count++;
 		if (random_freq_move_count == 30)
 			random_freq_move_count = 0;
+	}
+
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase)
+{
+	double sin_freq = sin_angle_freq / M_2PI;
+
+	double amplitude = get_Amplitude(sin_freq, 63);
+
+	double expect_saw_angle_freq = sin_angle_freq * 10;
+	Pulse_Mode pulse_Mode = P_1;
+	if (63 <= sin_freq)
+		pulse_Mode = P_1;
+	else if (60 <= sin_freq)
+		pulse_Mode = P_Wide_3;
+	else if (57 <= sin_freq)
+		pulse_Mode = P_3;
+	else if (44 <= sin_freq)
+		pulse_Mode = P_5;
+	else if (36 <= sin_freq)
+		pulse_Mode = P_7;
+	else if (16 <= sin_freq)
+	{
+		expect_saw_angle_freq = 400 * M_2PI;
+		pulse_Mode = Not_In_Sync;
+	}
+	else if (brake && sin_freq < 7.4)
+	{
+		Wave_Values wv;
+		wv.sin_value = 0;
+		wv.saw_value = 0;
+		wv.pwm_value = 0;
+		return wv;
+	}
+	else if (sin_freq >= 2)
+	{
+		double expect_saw_freq = 216 + (400 - 216) / 14 * (sin_freq - 2);
+		expect_saw_angle_freq = M_2PI * expect_saw_freq;
+		pulse_Mode = Not_In_Sync;
+	}
+	else
+	{
+		expect_saw_angle_freq = 216 * M_2PI;
+		pulse_Mode = Not_In_Sync;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);

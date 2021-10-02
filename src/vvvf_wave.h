@@ -55,3 +55,4 @@ Wave_Values calculate_9820_mitsubishi(bool brake, double initial_phase);
 Wave_Values calculate_9820_hitachi(bool brake, double initial_phase);
 Wave_Values calculate_E233(bool brake, double initial_phase);
 Wave_Values calculate_silent(bool brake,double initial_phase);
+Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase);
