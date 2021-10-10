@@ -35,7 +35,7 @@ double from_sin_table(double radian)
 	if (radian > M_PI)
 		cycles = (long)(radian / M_PI);
 	double pi_radian = radian - (double)cycles * M_PI;
-	int loc = round((double)pi_radian * 636.3014624813976);
+	int loc = (int)round((double)pi_radian * 636.3014624813976);
 	double val = sin_table[loc];
 	if (cycles % 2 != 0)
 		val = -(double)val;
@@ -64,9 +64,9 @@ double get_saw_value(double time, double angle_frequency, double initial_phase)
 double get_sin_value(double time, double angle_frequency, double initial_phase, double amplitude)
 {
 #ifndef USE_FAST_CALCULATE
-	return (sin(time * angle_frequency + initial_phase) + 1) * amplitude;
+	return sin(time * angle_frequency + initial_phase) * amplitude;
 #else
-	return (from_sin_table(time * angle_frequency + initial_phase)) * amplitude;
+	return from_sin_table(time * angle_frequency + initial_phase) * amplitude;
 #endif
 }
 
@@ -632,4 +632,28 @@ Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase)
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase)
+{
+    double sin_freq = sin_angle_freq / M_2PI;
+
+    double amplitude = get_Amplitude(sin_freq, 55);
+
+    if(53<=sin_freq && sin_freq <= 55)
+    {
+        amplitude = 5 + (get_Amplitude(53, 55) - 5) / 2.0 * (55-sin_freq);
+    }
+
+	double expect_saw_angle_freq = sin_angle_freq * 10;
+	Pulse_Mode pulse_Mode = P_1;
+	if (55 <= sin_freq) pulse_Mode = P_1;
+    else if (34 <= sin_freq) pulse_Mode = P_9;
+    else
+    {
+        expect_saw_angle_freq = 1045 * M_2PI;
+        pulse_Mode = Not_In_Sync;
+    }
+
+    return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
