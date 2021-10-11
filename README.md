@@ -19,7 +19,7 @@ sudo apt install gcc-arm-none-eabi
 I don't know why but you have to do this at raspberry pi, otherwise you will fail to build.<br>
 Seems some library doesn't exist when installed on not raspberry pi.<br>
 <br>
-<<Additional comment>><br>
+### Additional comment<br>
 You can also build at normal linux. But you change the include path of <br>
 `/usr/lib/arm-none-eabi/newlib/hard`<br>
 For me at ubuntu 20.04, it was<br>
