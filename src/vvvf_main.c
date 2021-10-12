@@ -1,14 +1,9 @@
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
-#include <math.h>
-#include <stdint.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "rpi_lib/gpio.h"
 #include "rpi_lib/delay.h"
-#include "rpi_lib/uart.h"
 #include "rpi_lib/rpi_address.h"
 
 
@@ -32,6 +27,8 @@
 #define button_L 8
 
 #define LED_PIN 47
+
+#define M_PI 3.14159265358979
 
 //#define DELAY_SEARCH
 
@@ -268,7 +265,6 @@ int pin_run(int mode){
 int main ( void )
 {
 	InitializeGpio();
-	UartInit();
 	pinMode(LED_PIN,OUTPUT);
 	led_high();
 	initialize_vvvf_pin();

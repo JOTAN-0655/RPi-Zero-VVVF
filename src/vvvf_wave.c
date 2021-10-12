@@ -1,10 +1,14 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
 
+#include <math.h>
+#include <stdlib.h>
+
 #define M_2PI 6.28318530717958
+#define M_PI 3.14159265358979
+#define M_PI_2 1.57079632679489661923
+#define M_2_PI 0.636619772367581343076
 
 //function caliculation
 
