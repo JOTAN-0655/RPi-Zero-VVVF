@@ -16,22 +16,22 @@ You need to install cross compiler.<br>
 ```
 sudo apt install gcc-arm-none-eabi
 ```
-I don't know why but you have to do this at raspberry pi, otherwise you will fail to build.<br>
-Seems some library doesn't exist when installed on not raspberry pi.<br>
-<br>
-### Additional comment<br>
-You can also build at normal linux. But you need to change the include path of <br>
-At Makefile in line 35<br>
-`/usr/lib/arm-none-eabi/newlib/hard`<br>
-For me at ubuntu 20.04, it was<br>
-`/usr/lib/arm-none-eabi/newlib/arm/v5te/hard`<br>
-
 
 # build
+
+## Building at Raspberry PI
 To build these code, just run
 ```
 sh build.sh
 ```
+
+## Building at Linux
+Change line 35 of Makefile<br>
+`/usr/lib/arm-none-eabi/newlib/hard`<br>
+to<br>
+`/usr/lib/arm-none-eabi/newlib/arm/v5te/hard`<br>
+
+
 
 # install to RPi zero
 Since you have finished your code build, you will find `kernel.img` inside of build folder.<br>
