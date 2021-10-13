@@ -30,7 +30,8 @@ Change line 35 of Makefile<br>
 `/usr/lib/arm-none-eabi/newlib/hard`<br>
 to<br>
 `/usr/lib/arm-none-eabi/newlib/arm/v5te/hard`<br>
-
+and run<br>
+`sudo apt install gcc-arm-none-eabi`
 
 
 # install to RPi zero
