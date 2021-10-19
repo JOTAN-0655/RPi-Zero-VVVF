@@ -21,9 +21,7 @@ sudo apt install gcc-arm-none-eabi
 
 ## Building at Raspberry PI
 To build these code, just run
-```
-sh build.sh
-```
+`sh build.sh`
 
 ## Building at Linux
 Change line 35 of Makefile<br>
@@ -31,7 +29,7 @@ Change line 35 of Makefile<br>
 to<br>
 `/usr/lib/arm-none-eabi/newlib/arm/v5te/hard`<br>
 and run<br>
-`sudo apt install gcc-arm-none-eabi`
+`sh build.sh`
 
 
 # install to RPi zero
