@@ -4,6 +4,10 @@ void led_toggle();
 void led_high();
 void led_low();
 
+void debug_pin_toggle();
+void debug_pin_high();
+void debug_pin_low();
+
 void all_off();
 void initialize_vvvf_pin();
 int get_Mascon_status();

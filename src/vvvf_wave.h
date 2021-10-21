@@ -1,5 +1,3 @@
-#define USE_FAST_CALCULATE
-
 #include "rpi_lib/gpio.h"
 
 
@@ -16,11 +14,6 @@ typedef enum {
     , P_43, P_45, P_47, P_49, P_51, P_53, P_55, P_57, P_59, P_61
 } Pulse_Mode;
 
-void generate_sin_table();
-void test_sin_table();
-double mod_d(double a,double b);
-
-double from_sin_table(double radian);
 double get_saw_value_simple(double x);
 
 double get_saw_value(double time, double angle_frequency, double initial_phase);
@@ -57,3 +50,5 @@ Wave_Values calculate_E233(bool brake, double initial_phase);
 Wave_Values calculate_silent(bool brake,double initial_phase);
 Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase);
 Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase);
+Wave_Values calculate_Famima(bool brake, double initial_phase);
+Wave_Values calculate_real_doremi(bool brake, double initial_phase);

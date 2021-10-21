@@ -1,6 +1,5 @@
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
-#include <stdlib.h>
 
 #include "rpi_lib/gpio.h"
 #include "rpi_lib/delay.h"
@@ -26,6 +25,7 @@
 #define button_SEL 7
 #define button_L 8
 
+#define debug_PIN 25
 #define LED_PIN 47
 
 #define M_PI 3.14159265358979
@@ -44,6 +44,20 @@ void led_high(){
 void led_low(){
 	digitalWrite(LED_PIN,HIGH);
 	led_toggle_v = 0;
+}
+
+char debug_pin_stat = 0;
+void debug_pin_toggle(){
+	if(debug_pin_stat==0) debug_pin_high();
+	else debug_pin_low();
+}
+void debug_pin_high(){
+	digitalWrite(debug_PIN,HIGH);
+	debug_pin_stat = 1;
+}
+void debug_pin_low(){
+	digitalWrite(debug_PIN,LOW);
+	debug_pin_stat = 0;
 }
 
 void all_off(){
@@ -70,6 +84,9 @@ void initialize_vvvf_pin(){
 	pinMode(button_R, INPUT);
 	pinMode(button_SEL, INPUT);
 	pinMode(button_L, INPUT);
+	
+	pinMode(LED_PIN,OUTPUT);
+	pinMode(debug_PIN,OUTPUT);
 
 	all_off();
 }
@@ -142,7 +159,7 @@ void set_phase(char phase,int stat){
 	}
 }
 
-char total_modes = 9;
+char total_modes = 11;
 Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	if(mode == 0) return calculate_207(brake,initial_phase);
 	else if(mode == 1) return calculate_E231(brake,initial_phase);
@@ -154,6 +171,8 @@ Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	else if(mode == 7) return calculate_E233(brake,initial_phase);
 	else if(mode == 8) return calculate_mitsubishi_gto(brake,initial_phase);
 	else if(mode == 9) return calculate_toyo_IGBT(brake,initial_phase);
+	else if(mode == 10) return calculate_Famima(brake,initial_phase);
+	else if(mode == 11) return calculate_real_doremi(brake,initial_phase);
 	else return calculate_silent(brake,initial_phase);
 }
 
@@ -252,12 +271,13 @@ int pin_run(int mode){
 		}else{
 			button_press_count=0;
 		}
-		
-		
+
 		while(end_targer_system_time > get_systime());
-		
+		debug_pin_toggle();
     }
 	led_low();
+	debug_pin_low();
+
     all_off();
 	return return_val;
 }
@@ -265,13 +285,12 @@ int pin_run(int mode){
 int main ( void )
 {
 	InitializeGpio();
-	pinMode(LED_PIN,OUTPUT);
-	led_high();
+	led_low();	
+	debug_pin_low();
+
 	initialize_vvvf_pin();
-	generate_sin_table();
 	reset_all_variables();
-	srand(0);
-	led_low();
+
 
 	int mode = 0;
 	while(1){

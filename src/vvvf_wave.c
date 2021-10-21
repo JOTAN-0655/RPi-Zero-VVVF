@@ -1,9 +1,6 @@
-
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
-
-#include <math.h>
-#include <stdlib.h>
+#include "my_math.h"
 
 #define M_2PI 6.28318530717958
 #define M_PI 3.14159265358979
@@ -11,40 +8,6 @@
 #define M_2_PI 0.636619772367581343076
 
 //function caliculation
-
-unsigned const sin_table_size = 2000;
-double sin_table[2000];
-void generate_sin_table()
-{
-#ifdef USE_FAST_CALCULATE
-	unsigned division = sin_table_size;
-	for (unsigned i = 0; i < division; i++)
-	{
-		double cal_radian = M_PI / ((double)sin_table_size - 1) * i;
-		double val = sin(cal_radian);
-		sin_table[i] = val;
-	}
-#endif
-}
-
-double mod_d(double a, double b)
-{
-	long div = (long)(a / b);
-	return a - (double)(div * b);
-}
-
-double from_sin_table(double radian)
-{
-	long cycles = 0;
-	if (radian > M_PI)
-		cycles = (long)(radian / M_PI);
-	double pi_radian = radian - (double)cycles * M_PI;
-	int loc = (int)round((double)pi_radian * 636.3014624813976);
-	double val = sin_table[loc];
-	if (cycles % 2 != 0)
-		val = -(double)val;
-	return val;
-}
 double get_saw_value_simple(double x)
 {
 	double fixed_x = x - (double)((int)(x / M_2PI) * M_2PI);
@@ -58,20 +21,12 @@ double get_saw_value_simple(double x)
 
 double get_saw_value(double time, double angle_frequency, double initial_phase)
 {
-#ifndef USE_FAST_CALCULATE
-	return -asin(sin(time * angle_frequency + initial_phase)) / M_PI * 2;
-#else
 	return -get_saw_value_simple(time * angle_frequency + initial_phase);
-#endif
 }
 
 double get_sin_value(double time, double angle_frequency, double initial_phase, double amplitude)
 {
-#ifndef USE_FAST_CALCULATE
 	return sin(time * angle_frequency + initial_phase) * amplitude;
-#else
-	return from_sin_table(time * angle_frequency + initial_phase) * amplitude;
-#endif
 }
 
 double get_pwm_value(double sin_value, double saw_value)
@@ -114,7 +69,7 @@ Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initi
 double get_Amplitude(double freq, double max_freq)
 {
 
-	double rate = 0.98, init = 0.02;
+	double rate = 0.99, init = 0.01;
 	if (freq > max_freq)
 		return 1.0;
 	if (freq <= 0.1)
@@ -388,9 +343,9 @@ Wave_Values calculate_E235(bool brake, double initial_phase)
 		if (random_freq_move_count == 0)
 		{
 			//saw_freq = 740;
-			double random_v = random();
-			double diff_freq = mod_d(random_v, 100.0);
-			if (mod_d(random_v, 500.0) < 250)
+			int random_v = my_random();
+			int diff_freq = mod_i(random_v,100);
+			if (mod_i(random_v,500) < 250)
 				diff_freq = -diff_freq;
 
 			double base_freq = (double)550 + 3.148148148148148 * (sin_freq); //170.0/54.0*(sin_freq);
@@ -508,9 +463,10 @@ Wave_Values calculate_9820_hitachi(bool brake, double initial_phase)
 		pulse_Mode = P_Wide_3;
 	else if (49 <= sin_freq)
 	{
-		double expect_saw_freq = 780 + (1800 - 780) / 11 * (sin_freq - 49);
+		double expect_saw_freq = 780 + (1820 - 780) / 11 * (sin_freq - 49);
 		expect_saw_angle_freq = expect_saw_freq * M_2PI;
 		pulse_Mode = Not_In_Sync;
+		amplitude = 3.0 + (-3.0 + get_Amplitude(sin_freq, 49)) / 11 * (60 - sin_freq);
 	}
 	else
 	{
@@ -538,8 +494,9 @@ Wave_Values calculate_E233(bool brake, double initial_phase)
 		pulse_Mode = Not_In_Sync;
 		if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 		{
-			double diff_freq = mod_d(random(), 100.0);
-			if (mod_d(random(), 500.0) < 250)
+			int random_v = my_random();
+			int diff_freq = mod_i(random_v,100);
+			if (mod_i(random_v,500) < 250)
 				diff_freq = -diff_freq;
 			double silent_random_freq = 750 + diff_freq;
 
@@ -572,8 +529,9 @@ Wave_Values calculate_silent(bool brake, double initial_phase)
 		pulse_Mode = Not_In_Sync;
 		if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 		{
-			double diff_freq = mod_d(random(), 100.0);
-			if (mod_d(random(), 500.0) < 250)
+			int random_v = my_random();
+			int diff_freq = mod_i(random_v,100);
+			if (mod_i(random_v,500) < 250)
 				diff_freq = -diff_freq;
 			double silent_random_freq = 550 + diff_freq;
 
@@ -640,24 +598,144 @@ Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase)
 
 Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase)
 {
-    double sin_freq = sin_angle_freq / M_2PI;
+	double sin_freq = sin_angle_freq / M_2PI;
 
-    double amplitude = get_Amplitude(sin_freq, 55);
+	double amplitude = get_Amplitude(sin_freq, 55);
 
-    if(53<=sin_freq && sin_freq <= 55)
-    {
-        amplitude = 5 + (get_Amplitude(53, 55) - 5) / 2.0 * (55-sin_freq);
-    }
+	if (53 <= sin_freq && sin_freq <= 55)
+	{
+		amplitude = 5 + (get_Amplitude(53, 55) - 5) / 2.0 * (55 - sin_freq);
+	}
 
 	double expect_saw_angle_freq = sin_angle_freq * 10;
 	Pulse_Mode pulse_Mode = P_1;
-	if (55 <= sin_freq) pulse_Mode = P_1;
-    else if (34 <= sin_freq) pulse_Mode = P_9;
-    else
-    {
-        expect_saw_angle_freq = 1045 * M_2PI;
-        pulse_Mode = Not_In_Sync;
-    }
+	if (55 <= sin_freq)
+		pulse_Mode = P_1;
+	else if (34 <= sin_freq)
+		pulse_Mode = P_9;
+	else
+	{
+		expect_saw_angle_freq = 1045 * M_2PI;
+		pulse_Mode = Not_In_Sync;
+	}
 
-    return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_Famima(bool brake, double initial_phase)
+{
+	double sin_freq = sin_angle_freq / M_2PI;
+
+	double amplitude = get_Amplitude(sin_freq, 60);
+
+	double expect_saw_angle_freq = 0;
+	Pulse_Mode pulse_mode;
+	if (60 <= sin_freq)
+		pulse_mode = P_1;
+	else if (56 <= sin_freq)
+		pulse_mode = P_3;
+	else
+	{
+		double expect_saw_freq = 0;
+		if (48 <= sin_freq)
+			expect_saw_freq = 622;
+		else if (44 <= sin_freq)
+			expect_saw_freq = 466;
+		else if (40 <= sin_freq)
+			expect_saw_freq = 698;
+		else if (36 <= sin_freq)
+			expect_saw_freq = 783;
+		else if (32 <= sin_freq)
+			expect_saw_freq = 698;
+		else if (28 <= sin_freq)
+			expect_saw_freq = 466;
+		else if (20 <= sin_freq)
+			expect_saw_freq = 932;
+		else if (16 <= sin_freq)
+			expect_saw_freq = 587;
+		else if (12 <= sin_freq)
+			expect_saw_freq = 622;
+		else if (8 <= sin_freq)
+			expect_saw_freq = 466;
+		else if (4 <= sin_freq)
+			expect_saw_freq = 622;
+		else
+			expect_saw_freq = 783;
+
+		expect_saw_angle_freq = M_2PI * expect_saw_freq;
+		pulse_mode = Not_In_Sync;
+	}
+
+	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_real_doremi(bool brake, double initial_phase)
+{
+	double sin_freq = sin_angle_freq / M_2PI;
+
+	double amplitude = get_Amplitude(sin_freq, 80);
+
+	double expect_saw_angle_freq = 0;
+	Wave_Values wv;
+	Pulse_Mode pulse_mode;
+	if (80 <= sin_freq)
+		pulse_mode = P_1;
+	else if (57 <= sin_freq)
+		pulse_mode = P_Wide_3;
+	else if (50 <= sin_freq)
+		pulse_mode = P_3;
+	else if (43 <= sin_freq)
+		pulse_mode = P_5;
+	else if (35 <= sin_freq)
+		pulse_mode = P_7;
+	else if (30 <= sin_freq)
+		pulse_mode = P_12;
+	else if (27 <= sin_freq)
+		pulse_mode = P_15;
+	else if (24.5 <= sin_freq)
+		pulse_mode = P_18;
+	else
+	{
+		if (!brake)
+		{
+			double expect_saw_freq = 0;
+			if (5.6 <= sin_freq)
+				expect_saw_freq = 587;
+			else if (5 <= sin_freq)
+				expect_saw_freq = 523;
+			else if (4.3 <= sin_freq)
+				expect_saw_freq = 493;
+			else if (3.4 <= sin_freq)
+				expect_saw_freq = 440;
+			else if (2.7 <= sin_freq)
+				expect_saw_freq = 391;
+			else if (2.0 <= sin_freq)
+				expect_saw_freq = 349;
+			else if (1.5 <= sin_freq)
+				expect_saw_freq = 329;
+			else if (0.5 <= sin_freq)
+				expect_saw_freq = 293;
+			else
+				expect_saw_freq = 261;
+			expect_saw_angle_freq = M_2PI * expect_saw_freq;
+			pulse_mode = Not_In_Sync;
+		}
+		else
+		{
+			if (sin_freq > 4)
+			{
+				expect_saw_angle_freq = M_2PI * 400;
+				pulse_mode = Not_In_Sync;
+			}
+			else
+			{
+				wv.sin_value = 0;
+				wv.saw_value = 0;
+				wv.pwm_value = 0;
+				return wv;
+			}
+		}
+	}
+
+	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
