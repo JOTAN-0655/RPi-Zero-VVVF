@@ -159,7 +159,7 @@ void set_phase(char phase,int stat){
 	}
 }
 
-char total_modes = 11;
+char total_modes = 12;
 Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	if(mode == 0) return calculate_207(brake,initial_phase);
 	else if(mode == 1) return calculate_E231(brake,initial_phase);
@@ -173,6 +173,7 @@ Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
 	else if(mode == 9) return calculate_toyo_IGBT(brake,initial_phase);
 	else if(mode == 10) return calculate_Famima(brake,initial_phase);
 	else if(mode == 11) return calculate_real_doremi(brake,initial_phase);
+	else if(mode == 12) return calculate_toubu_50050(brake,initial_phase);
 	else return calculate_silent(brake,initial_phase);
 }
 
