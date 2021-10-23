@@ -459,8 +459,10 @@ Wave_Values calculate_9820_hitachi(bool brake, double initial_phase)
 	Pulse_Mode pulse_Mode = P_1;
 	if (67 <= sin_freq)
 		pulse_Mode = P_1;
-	else if (60 <= sin_freq)
+	else if (60 <= sin_freq){
 		pulse_Mode = P_Wide_3;
+		amplitude = 0.8 + 0.2 / 8.0 * (sin_freq - 60);
+	}
 	else if (49 <= sin_freq)
 	{
 		double expect_saw_freq = 780 + (1820 - 780) / 11 * (sin_freq - 49);
@@ -749,8 +751,10 @@ Wave_Values calculate_toubu_50050(bool brake, double initial_phase)
 	Pulse_Mode pulse_Mode = P_1;
 	if (61 <= sin_freq)
 		pulse_Mode = P_1;
-	else if (58 <= sin_freq)
+	else if (58 <= sin_freq){
 		pulse_Mode = P_Wide_3;
+		amplitude = 0.8 + 0.2 / 4.0 * (sin_freq - 58);
+	}
 	else if (49 <= sin_freq)
 	{
 		pulse_Mode = Not_In_Sync;
@@ -762,6 +766,12 @@ Wave_Values calculate_toubu_50050(bool brake, double initial_phase)
 		pulse_Mode = Not_In_Sync;
 		double base_freq = (double)730 - 50.0 / 49.0 * (sin_freq); //170.0/54.0*(sin_freq);
 		expect_saw_angle_freq = M_2PI * base_freq;
+		
+	}
+	else if(brake && sin_freq <= 4)
+    {
+		pulse_Mode = Not_In_Sync;
+		expect_saw_angle_freq = M_2PI * 200;
 	}
 	else
 	{
