@@ -29,6 +29,7 @@
 #define LED_PIN 47
 
 #define M_PI 3.14159265358979
+#define M_2PI 6.28318530717958
 
 //#define DELAY_SEARCH
 
@@ -160,21 +161,21 @@ void set_phase(char phase,int stat){
 }
 
 char total_modes = 12;
-Wave_Values get_Value_mode(int mode,bool brake,double initial_phase){
-	if(mode == 0) return calculate_207(brake,initial_phase);
-	else if(mode == 1) return calculate_E231(brake,initial_phase);
-	else if(mode == 2) return calculate_doremi(brake,initial_phase);
-	else if(mode == 3) return calculate_E235(brake,initial_phase);
-	else if(mode == 4) return calculate_E209(brake,initial_phase);
-	else if(mode == 5) return calculate_9820_mitsubishi(brake,initial_phase);
-	else if(mode == 6) return calculate_9820_hitachi(brake,initial_phase);
-	else if(mode == 7) return calculate_E233(brake,initial_phase);
-	else if(mode == 8) return calculate_mitsubishi_gto(brake,initial_phase);
-	else if(mode == 9) return calculate_toyo_IGBT(brake,initial_phase);
-	else if(mode == 10) return calculate_Famima(brake,initial_phase);
-	else if(mode == 11) return calculate_real_doremi(brake,initial_phase);
-	else if(mode == 12) return calculate_toubu_50050(brake,initial_phase);
-	else return calculate_silent(brake,initial_phase);
+Wave_Values get_Value_mode(int mode,bool brake,double initial_phase,double wave_stat){
+	if(mode == 0) return calculate_207(brake,initial_phase,wave_stat);
+	else if(mode == 1) return calculate_E231(brake,initial_phase,wave_stat);
+	else if(mode == 2) return calculate_doremi(brake,initial_phase,wave_stat);
+	else if(mode == 3) return calculate_E235(brake,initial_phase,wave_stat);
+	else if(mode == 4) return calculate_E209(brake,initial_phase,wave_stat);
+	else if(mode == 5) return calculate_9820_mitsubishi(brake,initial_phase,wave_stat);
+	else if(mode == 6) return calculate_9820_hitachi(brake,initial_phase,wave_stat);
+	else if(mode == 7) return calculate_E233(brake,initial_phase,wave_stat);
+	else if(mode == 8) return calculate_mitsubishi_gto(brake,initial_phase,wave_stat);
+	else if(mode == 9) return calculate_toyo_IGBT(brake,initial_phase,wave_stat);
+	else if(mode == 10) return calculate_Famima(brake,initial_phase,wave_stat);
+	else if(mode == 11) return calculate_real_doremi(brake,initial_phase,wave_stat);
+	else if(mode == 12) return calculate_toubu_50050(brake,initial_phase,wave_stat);
+	else return calculate_silent(brake,initial_phase,wave_stat);
 }
 
 char count = 0;
@@ -201,11 +202,12 @@ int pin_run(int mode){
 
 
 		int stat_U = 0,stat_V=0,stat_W=0;
+		double sin_freq = sin_angle_freq / M_2PI;
 		for(int i = 0; i < 3; i++)
 		{
 			if(!update_pin) continue;
 			double initial_phase = (double)2.094395393195 * (double)i;//(double)2.094395102393195 * (double)i;
-			Wave_Values wv = get_Value_mode(mode,brake,initial_phase);
+			Wave_Values wv = get_Value_mode(mode,brake,initial_phase,sin_freq);
 			int require_stat = (int)wv.pwm_value;
 			if (i==0) stat_U = require_stat;
 			else if(i==1) stat_V = require_stat;
