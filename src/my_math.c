@@ -102,10 +102,12 @@ int random_table[1000] = {
 
 int my_random()
 {
-    if (++ramdom_current_loc >= random_table_size){
-        ramdom_current_loc = 0;
-    }
-    return random_table[ramdom_current_loc];
+    int random = random_table[ramdom_current_loc];
+    if(random%2==0) ramdom_current_loc += 2;
+    else ramdom_current_loc++;
+
+    if(ramdom_current_loc >= random_table_size) ramdom_current_loc = 0;
+    return random;
 }
 
 int round(double x)

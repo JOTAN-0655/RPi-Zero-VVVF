@@ -196,9 +196,9 @@ int pin_run(int mode){
 	while (1)
     {
 		start_system_time = get_systime();
-		end_targer_system_time = start_system_time + 25;
-		sin_time += 0.000025;
-		saw_time += 0.000025;
+		end_targer_system_time = start_system_time + 15;
+		sin_time += 0.000015;
+		saw_time += 0.000015;
 
 
 		int stat_U = 0,stat_V=0,stat_W=0;
@@ -221,22 +221,20 @@ int pin_run(int mode){
 		set_phase(0,stat_U);
 		set_phase(1,stat_V);
 		set_phase(2,stat_W);
-
 		count++;
 		if (count % 8 == 0 && do_frequency_change)
 		{
 			count=0;
 			double sin_new_angle_freq = sin_angle_freq;
-
-			if(get_Mascon_status()-4 > 0){
-				sin_new_angle_freq += M_PI / 1000.0 * (get_Mascon_status() - 4) ;
+			char mascon_status = (char)get_Mascon_status();
+			if(mascon_status-4 > 0){
+				sin_new_angle_freq += 0.0020943951023932 * (mascon_status - 4) ;
 				brake = false;
-			}else if(get_Mascon_status() - 4 < 0){
-				sin_new_angle_freq -= M_PI / 1000.0 * (4-get_Mascon_status());
+			}else if(mascon_status - 4 < 0){
+				sin_new_angle_freq -= 0.0020943951023932 * (4-mascon_status);
 				brake = true;
 			}
-			
-			if(sin_new_angle_freq > 300.0 * M_PI) sin_new_angle_freq = 300.0 * M_PI;
+			if(sin_new_angle_freq > 942.4777960769379) sin_new_angle_freq = 942.4777960769379;
 			
 			if(sin_new_angle_freq <= 0){
 				sin_time = 0;
@@ -246,12 +244,12 @@ int pin_run(int mode){
 				all_off();
 			}else{
 				disconnect = false;
-				sin_time *= sin_angle_freq / sin_new_angle_freq;
+				sin_time *= sin_angle_freq;
+				sin_time /=  sin_new_angle_freq;
 				sin_angle_freq = sin_new_angle_freq;
-			}
-			
-			
+			}		
 		}
+
 
 		if(digitalRead(button_R)==0  && sin_angle_freq == 0){
 			if(button_press_count==1000){
@@ -274,7 +272,6 @@ int pin_run(int mode){
 		}else{
 			button_press_count=0;
 		}
-
 		while(end_targer_system_time > get_systime());
 		debug_pin_toggle();
     }

@@ -161,8 +161,10 @@ Wave_Values calculate_E231(bool brake, double initial_phase,double wave_stat)
 	Pulse_Mode pulse_mode;
 	if (wave_stat > 67)
 		pulse_mode = P_1;
-	else if (wave_stat > 60)
+	else if (wave_stat > 60){
 		pulse_mode = P_Wide_3;
+		amplitude = 0.8 + 0.2 / 8.0 * (wave_stat - 60);
+	}
 	else if (49 <= wave_stat && wave_stat <= 60)
 	{
 		double expect_saw_freq = 710 + (1750 - 710) / 11 * (wave_stat - 49);
@@ -197,7 +199,7 @@ Wave_Values calculate_207(bool brake, double initial_phase,double wave_stat)
 	else if (44 <= wave_stat)
 		pulse_mode = P_5;
 	else if (31 <= wave_stat)
-		pulse_mode = P_10;
+		pulse_mode = P_9;
 	else if (14 <= wave_stat)
 		pulse_mode = P_15;
 	else if (wave_stat < 14 && !brake)
