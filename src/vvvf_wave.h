@@ -53,3 +53,4 @@ Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase,double wave_sta
 Wave_Values calculate_Famima(bool brake, double initial_phase,double wave_stat);
 Wave_Values calculate_real_doremi(bool brake, double initial_phase,double wave_stat);
 Wave_Values calculate_toubu_50050(bool brake, double initial_phase,double wave_stat);
+Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double wave_stat);
