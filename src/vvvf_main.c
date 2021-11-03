@@ -176,9 +176,10 @@ Wave_Values get_Value_mode(int mode,bool brake,double initial_phase,double wave_
 	else if(mode == 10) return calculate_toyo_IGBT(brake,initial_phase,wave_stat);
 	else if(mode == 11) return calculate_toubu_50050(brake,initial_phase,wave_stat);
 	else if(mode == 12) return calculate_225_5100_mitsubishi(brake,initial_phase,wave_stat);
+	else if(mode == 13) return calculate_321_hitachi(brake,initial_phase,wave_stat);
 	
-	else if(mode == 13) return calculate_Famima(brake,initial_phase,wave_stat);
-	else if(mode == 14) return calculate_real_doremi(brake,initial_phase,wave_stat);
+	else if(mode == 14) return calculate_Famima(brake,initial_phase,wave_stat);
+	else if(mode == 15) return calculate_real_doremi(brake,initial_phase,wave_stat);
 	
 	else return calculate_silent(brake,initial_phase,wave_stat);
 }

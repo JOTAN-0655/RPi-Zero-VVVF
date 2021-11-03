@@ -55,3 +55,4 @@ Wave_Values calculate_real_doremi(bool brake, double initial_phase,double wave_s
 Wave_Values calculate_toubu_50050(bool brake, double initial_phase,double wave_stat);
 Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double wave_stat);
 Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, double wave_stat);
+Wave_Values calculate_321_hitachi(bool brake, double initial_phase, double wave_stat);
