@@ -584,26 +584,49 @@ Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase, double wa
 
 Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase, double wave_stat)
 {
-	double amplitude = get_Amplitude(wave_stat, 55);
+	if(brake){
+		double amplitude = get_Amplitude(wave_stat, 98);
 
-	if (53 <= wave_stat && wave_stat <= 55)
-	{
-		amplitude = 5 + (get_Amplitude(53, 55) - 5) / 2.0 * (55 - wave_stat);
+		if (96 <= wave_stat && wave_stat <= 98)
+		{
+			amplitude = 5 + (get_Amplitude(96, 98) - 5) / 2.0 * (98 - wave_stat);
+		}
+
+		double expect_saw_angle_freq = sin_angle_freq * 10;
+		Pulse_Mode pulse_Mode = P_1;
+		if (98 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (33 <= wave_stat)
+			pulse_Mode = P_9;
+		else
+		{
+			expect_saw_angle_freq = 1045 * M_2PI;
+			pulse_Mode = Not_In_Sync;
+		}
+
+		return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+	}else{
+		double amplitude = get_Amplitude(wave_stat, 55);
+
+		if (53 <= wave_stat && wave_stat <= 55)
+		{
+			amplitude = 5 + (get_Amplitude(53, 55) - 5) / 2.0 * (55 - wave_stat);
+		}
+
+		double expect_saw_angle_freq = sin_angle_freq * 10;
+		Pulse_Mode pulse_Mode = P_1;
+		if (55 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (34 <= wave_stat)
+			pulse_Mode = P_9;
+		else
+		{
+			expect_saw_angle_freq = 1045 * M_2PI;
+			pulse_Mode = Not_In_Sync;
+		}
+
+		return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 	}
-
-	double expect_saw_angle_freq = sin_angle_freq * 10;
-	Pulse_Mode pulse_Mode = P_1;
-	if (55 <= wave_stat)
-		pulse_Mode = P_1;
-	else if (34 <= wave_stat)
-		pulse_Mode = P_9;
-	else
-	{
-		expect_saw_angle_freq = 1045 * M_2PI;
-		pulse_Mode = Not_In_Sync;
-	}
-
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
 Wave_Values calculate_Famima(bool brake, double initial_phase, double wave_stat)
@@ -872,4 +895,83 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 	}
 
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, double wave_stat)
+{
+	double amplitude = 1.0;
+
+	double expect_saw_angle_freq = sin_angle_freq * 10;
+	Pulse_Mode pulse_Mode = P_1;
+
+	if (!brake)
+	{
+		if (56 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (48 <= wave_stat)
+		{
+			pulse_Mode = P_9;
+			amplitude = 1.1 + (2 - 1.1) / 8.0 * (wave_stat - 48);
+		}
+		else
+		{
+			amplitude = get_Amplitude(wave_stat, 48);
+			pulse_Mode = Not_In_Sync;
+			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
+			{
+				int random_v = my_random();
+				int diff_freq = mod_i(random_v, 100);
+				if (mod_i(random_v, 500) < 250)
+					diff_freq = -diff_freq;
+
+				double silent_random_freq = 1050 + diff_freq;
+
+				expect_saw_angle_freq = M_2PI * silent_random_freq;
+				pre_saw_random_freq = expect_saw_angle_freq;
+			}
+			else
+			{
+				expect_saw_angle_freq = pre_saw_random_freq;
+			}
+			random_freq_move_count++;
+			if (random_freq_move_count == 30)
+				random_freq_move_count = 0;
+		}
+	}
+	else
+	{
+		if (77 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (59 <= wave_stat)
+		{
+			pulse_Mode = P_9;
+			amplitude = 0.8 + (2 - 0.8) / 18.0 * (wave_stat - 59);
+		}
+		else
+		{
+			amplitude = get_Amplitude(wave_stat, 74);
+			pulse_Mode = Not_In_Sync;
+			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
+			{
+				int random_v = my_random();
+				int diff_freq = mod_i(random_v, 100);
+				if (mod_i(random_v, 500) < 250)
+					diff_freq = -diff_freq;
+
+				double silent_random_freq = 1050 + diff_freq;
+
+				expect_saw_angle_freq = M_2PI * silent_random_freq;
+				pre_saw_random_freq = expect_saw_angle_freq;
+			}
+			else
+			{
+				expect_saw_angle_freq = pre_saw_random_freq;
+			}
+			random_freq_move_count++;
+			if (random_freq_move_count == 30)
+				random_freq_move_count = 0;
+		}
+	}
+
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
