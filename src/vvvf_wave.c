@@ -485,7 +485,7 @@ Wave_Values calculate_E233(bool brake, double initial_phase, double wave_stat)
 		if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 		{
 			int random_v = my_random();
-			int diff_freq = mod_i(random_v, 100);
+			int diff_freq = mod_i(random_v, 30);
 			if (mod_i(random_v, 500) < 250)
 				diff_freq = -diff_freq;
 			double silent_random_freq = 750 + diff_freq;
@@ -498,7 +498,7 @@ Wave_Values calculate_E233(bool brake, double initial_phase, double wave_stat)
 			expect_saw_angle_freq = pre_saw_random_freq;
 		}
 		random_freq_move_count++;
-		if (random_freq_move_count == 30)
+		if (random_freq_move_count == 100)
 			random_freq_move_count = 0;
 	}
 
@@ -518,7 +518,7 @@ Wave_Values calculate_silent(bool brake, double initial_phase, double wave_stat)
 		if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 		{
 			int random_v = my_random();
-			int diff_freq = mod_i(random_v, 100);
+			int diff_freq = mod_i(random_v, 30);
 			if (mod_i(random_v, 500) < 250)
 				diff_freq = -diff_freq;
 			double silent_random_freq = 550 + diff_freq;
@@ -531,7 +531,7 @@ Wave_Values calculate_silent(bool brake, double initial_phase, double wave_stat)
 			expect_saw_angle_freq = pre_saw_random_freq;
 		}
 		random_freq_move_count++;
-		if (random_freq_move_count == 30)
+		if (random_freq_move_count == 100)
 			random_freq_move_count = 0;
 	}
 
@@ -778,7 +778,7 @@ Wave_Values calculate_toubu_50050(bool brake, double initial_phase, double wave_
 		if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 		{
 			int random_v = my_random();
-			int diff_freq = mod_i(random_v, 100);
+			int diff_freq = mod_i(random_v, 30);
 			if (mod_i(random_v, 500) < 250)
 				diff_freq = -diff_freq;
 
@@ -794,7 +794,7 @@ Wave_Values calculate_toubu_50050(bool brake, double initial_phase, double wave_
 			expect_saw_angle_freq = pre_saw_random_freq;
 		}
 		random_freq_move_count++;
-		if (random_freq_move_count == 30)
+		if (random_freq_move_count == 100)
 			random_freq_move_count = 0;
 	}
 
@@ -831,7 +831,7 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 			{
 				int random_v = my_random();
-				int diff_freq = mod_i(random_v, 100);
+				int diff_freq = mod_i(random_v, 30);
 				if (mod_i(random_v, 500) < 250)
 					diff_freq = -diff_freq;
 
@@ -846,7 +846,7 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 				expect_saw_angle_freq = pre_saw_random_freq;
 			}
 			random_freq_move_count++;
-			if (random_freq_move_count == 30)
+			if (random_freq_move_count == 100)
 				random_freq_move_count = 0;
 		}
 	}
@@ -874,7 +874,7 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 			{
 				int random_v = my_random();
-				int diff_freq = mod_i(random_v, 100);
+				int diff_freq = mod_i(random_v, 30);
 				if (mod_i(random_v, 500) < 250)
 					diff_freq = -diff_freq;
 
@@ -889,7 +889,7 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 				expect_saw_angle_freq = pre_saw_random_freq;
 			}
 			random_freq_move_count++;
-			if (random_freq_move_count == 30)
+			if (random_freq_move_count == 100)
 				random_freq_move_count = 0;
 		}
 	}
@@ -920,7 +920,7 @@ Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, doub
 			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 			{
 				int random_v = my_random();
-				int diff_freq = mod_i(random_v, 100);
+				int diff_freq = mod_i(random_v, 30);
 				if (mod_i(random_v, 500) < 250)
 					diff_freq = -diff_freq;
 
@@ -934,7 +934,7 @@ Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, doub
 				expect_saw_angle_freq = pre_saw_random_freq;
 			}
 			random_freq_move_count++;
-			if (random_freq_move_count == 30)
+			if (random_freq_move_count == 100)
 				random_freq_move_count = 0;
 		}
 	}
@@ -954,7 +954,7 @@ Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, doub
 			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 			{
 				int random_v = my_random();
-				int diff_freq = mod_i(random_v, 100);
+				int diff_freq = mod_i(random_v, 30);
 				if (mod_i(random_v, 500) < 250)
 					diff_freq = -diff_freq;
 
@@ -968,7 +968,7 @@ Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, doub
 				expect_saw_angle_freq = pre_saw_random_freq;
 			}
 			random_freq_move_count++;
-			if (random_freq_move_count == 30)
+			if (random_freq_move_count == 100)
 				random_freq_move_count = 0;
 		}
 	}
