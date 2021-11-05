@@ -2,10 +2,15 @@
 Making VVVF inverter with raspberry pi zero.
 This code is for baremetal on raspberry pi zero.
 
-# disclaimer
+# terms of use
+## disclaimer
 PLEASE DO EVERYTHING BY YOUR OWN RESPONSIBILITY.<br>
 MAY CAUSE YOU A BIG DAMAGE WITH ELECTRONIC.<br>
 THIS VVVF CODE IS NOT MADE BY ENGINEER OR ANY PROFESSIONAL.<br>
+
+## credit
+Main author of this program is JOTAN-0655 except raspberry pi lib.<br>
+Please label this github url and references url if you upload on youtube or other websites.
 
 # references
 https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
