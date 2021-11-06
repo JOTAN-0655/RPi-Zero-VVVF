@@ -160,10 +160,10 @@ void set_phase(char phase,int stat){
 	}
 }
 
-char total_modes = 14;
+char total_modes = 16;
 Wave_Values get_Value_mode(int mode,bool brake,double initial_phase,double wave_stat){
 	if(mode == 0) return calculate_207(brake,initial_phase,wave_stat);
-	else if(mode == 1) return calculate_207_1000_update(brake,initial_phase,wave_stat);
+	else if(mode == 1) return calculate_toyo_GTO(brake,initial_phase,wave_stat);
 	else if(mode == 2) return calculate_doremi(brake,initial_phase,wave_stat);
 	else if(mode == 3) return calculate_E209(brake,initial_phase,wave_stat);
 	else if(mode == 4) return calculate_mitsubishi_gto(brake,initial_phase,wave_stat);
@@ -175,11 +175,12 @@ Wave_Values get_Value_mode(int mode,bool brake,double initial_phase,double wave_
 	else if(mode == 9) return calculate_E235(brake,initial_phase,wave_stat);
 	else if(mode == 10) return calculate_toyo_IGBT(brake,initial_phase,wave_stat);
 	else if(mode == 11) return calculate_toubu_50050(brake,initial_phase,wave_stat);
-	else if(mode == 12) return calculate_225_5100_mitsubishi(brake,initial_phase,wave_stat);
-	else if(mode == 13) return calculate_321_hitachi(brake,initial_phase,wave_stat);
+	else if(mode == 12) return calculate_207_1000_update(brake,initial_phase,wave_stat);
+	else if(mode == 13) return calculate_225_5100_mitsubishi(brake,initial_phase,wave_stat);
+	else if(mode == 14) return calculate_321_hitachi(brake,initial_phase,wave_stat);
 	
-	else if(mode == 14) return calculate_Famima(brake,initial_phase,wave_stat);
-	else if(mode == 15) return calculate_real_doremi(brake,initial_phase,wave_stat);
+	else if(mode == 15) return calculate_Famima(brake,initial_phase,wave_stat);
+	else if(mode == 16) return calculate_real_doremi(brake,initial_phase,wave_stat);
 	
 	else return calculate_silent(brake,initial_phase,wave_stat);
 }

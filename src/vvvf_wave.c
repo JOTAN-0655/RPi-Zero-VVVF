@@ -1060,3 +1060,127 @@ Wave_Values calculate_321_hitachi(bool brake, double initial_phase, double wave_
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
+
+Wave_Values calculate_toyo_GTO(bool brake, double initial_phase, double wave_stat)
+{
+	double amplitude = 1.0;
+
+	double expect_saw_angle_freq = sin_angle_freq * 10;
+	Pulse_Mode pulse_Mode = P_1;
+
+	if (brake)
+	{
+		amplitude = get_Amplitude(wave_stat, 77);
+
+		if (77 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (74 <= wave_stat)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 4.0 * (wave_stat - 74);
+		}
+		else if (69 <= wave_stat)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8;
+		}
+
+		else if (60 <= wave_stat)
+			pulse_Mode = P_3;
+		else if (43 <= wave_stat)
+			pulse_Mode = P_5;
+		else if (25 <= wave_stat)
+			pulse_Mode = P_9;
+		else if (6 <= wave_stat && wave_stat <= 9)
+		{
+			expect_saw_angle_freq = M_2PI * (260 + (365 - 260) / 25.0 * (wave_stat - 3));
+			pulse_Mode = Not_In_Sync;
+		}
+		else
+		{
+			if (wave_stat < 5)
+			{
+				Wave_Values wv;
+				wv.sin_value = 0;
+				wv.saw_value = 0;
+				wv.pwm_value = 0;
+				return wv;
+			}
+			pulse_Mode = Not_In_Sync;
+			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
+			{
+				int random_v = my_random();
+				int diff_freq = mod_i(random_v, 2);
+				if (mod_i(random_v, 500) < 250)
+					diff_freq = -diff_freq;
+
+				double base_freq = 260;
+				if (wave_stat > 3)
+					base_freq = (260 + (365 - 260) / 25.0 * (wave_stat - 3));
+				double silent_random_freq = base_freq + diff_freq;
+
+				expect_saw_angle_freq = M_2PI * silent_random_freq;
+				pre_saw_random_freq = expect_saw_angle_freq;
+			}
+			else
+			{
+				expect_saw_angle_freq = pre_saw_random_freq;
+			}
+			random_freq_move_count++;
+			if (random_freq_move_count == 100)
+				random_freq_move_count = 0;
+		}
+	}
+	else
+	{
+		amplitude = get_Amplitude(wave_stat, 60);
+
+		if (60 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (56 <= wave_stat)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 5.0 * (wave_stat - 56);
+		}
+
+		else if (51 <= wave_stat)
+			pulse_Mode = P_3;
+		else if (43 <= wave_stat)
+			pulse_Mode = P_5;
+		else if (27 <= wave_stat)
+			pulse_Mode = P_9;
+		else if (6 <= wave_stat && wave_stat <= 9)
+		{
+			expect_saw_angle_freq = M_2PI * (260 + (365 - 260) / 23.0 * (wave_stat - 3));
+			pulse_Mode = Not_In_Sync;
+		}
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
+			{
+				int random_v = my_random();
+				int diff_freq = mod_i(random_v, 2);
+				if (mod_i(random_v, 500) < 250)
+					diff_freq = -diff_freq;
+
+				double base_freq = 260;
+				if (wave_stat > 3)
+					base_freq = (260 + (365 - 260) / 23.0 * (wave_stat - 3));
+				double silent_random_freq = base_freq + diff_freq;
+
+				expect_saw_angle_freq = M_2PI * silent_random_freq;
+				pre_saw_random_freq = expect_saw_angle_freq;
+			}
+			else
+			{
+				expect_saw_angle_freq = pre_saw_random_freq;
+			}
+			random_freq_move_count++;
+			if (random_freq_move_count == 100)
+				random_freq_move_count = 0;
+		}
+	}
+
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
