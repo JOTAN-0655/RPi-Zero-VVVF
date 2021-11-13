@@ -39,7 +39,7 @@ double get_pwm_value(double sin_value, double saw_value)
 		return -1;
 }
 
-Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage,bool saw_oppose)
+Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage, bool saw_oppose)
 {
 	double sin = get_sin_value(time, angle_frequency, initial_phase, 1);
 	double saw = get_saw_value(time, angle_frequency, initial_phase);
@@ -55,7 +55,7 @@ Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_pha
 	return wv;
 }
 
-Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage, double carrier_mul,bool saw_oppose)
+Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage, double carrier_mul, bool saw_oppose)
 {
 	double carrier_saw = -get_saw_value(time, carrier_mul * sin_angle_frequency, carrier_mul * initial_phase);
 	double saw = -get_saw_value(time, sin_angle_frequency, initial_phase);
@@ -184,7 +184,7 @@ Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq
 
 	double saw_value = get_saw_value(saw_time, saw_angle_freq, 0);
 	if ((int)pulse_mode > (int)P_61)
-				saw_value = -saw_value;
+		saw_value = -saw_value;
 
 	double pwm_value = get_pwm_value(sin_value, saw_value);
 
@@ -195,7 +195,7 @@ Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq
 	return wv;
 }
 
-Wave_Values calculate_E231(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_E231(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 65);
 	double expect_saw_angle_freq = 0;
@@ -228,7 +228,7 @@ Wave_Values calculate_E231(bool brake, double initial_phase, double wave_stat)
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_207(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_207(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 60);
 
@@ -267,7 +267,7 @@ Wave_Values calculate_207(bool brake, double initial_phase, double wave_stat)
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_doremi(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_doremi(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 80);
 
@@ -337,7 +337,7 @@ Wave_Values calculate_doremi(bool brake, double initial_phase, double wave_stat)
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_E235(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_E235(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 54);
 
@@ -386,7 +386,7 @@ Wave_Values calculate_E235(bool brake, double initial_phase, double wave_stat)
 	return wv;
 }
 
-Wave_Values calculate_E209(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_E209(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 53);
 
@@ -422,7 +422,7 @@ Wave_Values calculate_E209(bool brake, double initial_phase, double wave_stat)
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_9820_mitsubishi(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_9820_mitsubishi(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 55);
 
@@ -460,7 +460,7 @@ Wave_Values calculate_9820_mitsubishi(bool brake, double initial_phase, double w
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_9820_hitachi(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_9820_hitachi(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 65);
 
@@ -488,7 +488,7 @@ Wave_Values calculate_9820_hitachi(bool brake, double initial_phase, double wave
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_E233(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_E233(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 50);
 	double expect_saw_angle_freq = 1;
@@ -500,13 +500,13 @@ Wave_Values calculate_E233(bool brake, double initial_phase, double wave_stat)
 	else
 	{
 		pulse_Mode = Not_In_Sync;
-		expect_saw_angle_freq = get_random_freq(750,30 ) * M_2PI;
+		expect_saw_angle_freq = get_random_freq(750, 30) * M_2PI;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_silent(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_silent(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 60);
 	double expect_saw_angle_freq = 1;
@@ -516,13 +516,13 @@ Wave_Values calculate_silent(bool brake, double initial_phase, double wave_stat)
 	else
 	{
 		pulse_Mode = Not_In_Sync;
-		expect_saw_angle_freq = get_random_freq(550,30 ) * M_2PI;
+		expect_saw_angle_freq = get_random_freq(550, 30) * M_2PI;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_mitsubishi_gto(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 63);
 
@@ -566,7 +566,7 @@ Wave_Values calculate_mitsubishi_gto(bool brake, double initial_phase, double wa
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_toyo_IGBT(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	if (brake)
 	{
@@ -616,7 +616,7 @@ Wave_Values calculate_toyo_IGBT(bool brake, double initial_phase, double wave_st
 	}
 }
 
-Wave_Values calculate_Famima(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_Famima(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 60);
 
@@ -661,7 +661,7 @@ Wave_Values calculate_Famima(bool brake, double initial_phase, double wave_stat)
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_real_doremi(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_real_doremi(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 80);
 
@@ -730,7 +730,7 @@ Wave_Values calculate_real_doremi(bool brake, double initial_phase, double wave_
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_toubu_50050(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_toubu_50050(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 61);
 	double expect_saw_angle_freq = 1;
@@ -763,13 +763,13 @@ Wave_Values calculate_toubu_50050(bool brake, double initial_phase, double wave_
 	{
 		pulse_Mode = Not_In_Sync;
 		double base_freq = (double)730 - 50.0 / 49.0 * (wave_stat); //170.0/54.0*(wave_stat);
-		expect_saw_angle_freq = get_random_freq((int)base_freq,30 ) * M_2PI;
+		expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_207_1000_update(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = get_Amplitude(wave_stat, 60);
 
@@ -797,7 +797,7 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 		{
 			pulse_mode = Not_In_Sync;
 			double base_freq = 550 + 3.272727272727273 * wave_stat;
-			expect_saw_angle_freq = get_random_freq((int)base_freq,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
 		}
 	}
 	else
@@ -822,14 +822,14 @@ Wave_Values calculate_207_1000_update(bool brake, double initial_phase, double w
 		{
 			pulse_mode = Not_In_Sync;
 			double base_freq = 550 + 3.272727272727273 * wave_stat;
-			expect_saw_angle_freq = get_random_freq((int)base_freq,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
 		}
 	}
 
 	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_225_5100_mitsubishi(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = 1.0;
 
@@ -849,7 +849,7 @@ Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, doub
 		{
 			amplitude = get_Amplitude(wave_stat, 48);
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = get_random_freq(1050,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq(1050, 30) * M_2PI;
 		}
 	}
 	else
@@ -865,14 +865,14 @@ Wave_Values calculate_225_5100_mitsubishi(bool brake, double initial_phase, doub
 		{
 			amplitude = get_Amplitude(wave_stat, 74);
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = get_random_freq(1050,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq(1050, 30) * M_2PI;
 		}
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_321_hitachi(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_321_hitachi(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = 1.0;
 
@@ -895,7 +895,7 @@ Wave_Values calculate_321_hitachi(bool brake, double initial_phase, double wave_
 			double base_freq = 1050;
 			if (4 >= wave_stat)
 				base_freq = 510 + ((wave_stat > 1) ? ((623 - 510) / 3.0 * (wave_stat - 1)) : 0);
-			expect_saw_angle_freq = get_random_freq((int)base_freq,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
 		}
 	}
 	else
@@ -911,14 +911,14 @@ Wave_Values calculate_321_hitachi(bool brake, double initial_phase, double wave_
 		{
 			amplitude = get_Amplitude(wave_stat, 55);
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = get_random_freq((int)1050,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)1050, 30) * M_2PI;
 		}
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
 
-Wave_Values calculate_toyo_GTO(bool brake, double initial_phase, double wave_stat)
+Wave_Values calculate_toyo_GTO(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	double amplitude = 1.0;
 
@@ -967,7 +967,7 @@ Wave_Values calculate_toyo_GTO(bool brake, double initial_phase, double wave_sta
 			double base_freq = 260;
 			if (wave_stat > 3)
 				base_freq = (260 + (365 - 260) / 25.0 * (wave_stat - 3));
-			expect_saw_angle_freq = get_random_freq((int)base_freq,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
 		}
 	}
 	else
@@ -1000,8 +1000,124 @@ Wave_Values calculate_toyo_GTO(bool brake, double initial_phase, double wave_sta
 			double base_freq = 260;
 			if (wave_stat > 3)
 				base_freq = (260 + (365 - 260) / 23.0 * (wave_stat - 3));
-			expect_saw_angle_freq = get_random_freq((int)base_freq,30 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
 		}
+	}
+
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_tokyu_9000_hitachi_gto(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
+{
+	double amplitude = 0;
+	double expect_saw_angle_freq = 0;
+	Pulse_Mode pulse_mode = Not_In_Sync;
+	if (brake) //settings for braking vvvf pattern
+	{
+		amplitude = get_Amplitude(wave_stat, 60);
+		expect_saw_angle_freq = wave_stat;
+		if (60 <= wave_stat)
+		{
+			pulse_mode = P_1;
+		}
+		else if (54 <= wave_stat)
+		{
+			pulse_mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 6.0 * (wave_stat - 54);
+		}
+		else if (50 <= wave_stat || (free_run && sin_angle_freq > 50 * M_2PI))
+			pulse_mode = P_3;
+		else if (41 <= wave_stat || (free_run && sin_angle_freq > 41 * M_2PI))
+			pulse_mode = P_5;
+		else if (27 <= wave_stat || (free_run && sin_angle_freq > 27 * M_2PI))
+			pulse_mode = P_9;
+		else if (14.5 <= wave_stat || (free_run && sin_angle_freq > 14.5 * M_2PI))
+			pulse_mode = P_15;
+		else if (8 <= wave_stat || (free_run && sin_angle_freq > 8 * M_2PI))
+			pulse_mode = P_27;
+		else if (7 <= wave_stat || (free_run && sin_angle_freq > 7 * M_2PI))
+			pulse_mode = P_45;
+		else if (5 <= wave_stat || (free_run && sin_angle_freq > 5 * M_2PI))
+		{
+			expect_saw_angle_freq = M_2PI * 200;
+			pulse_mode = Not_In_Sync;
+		}
+		else
+		{
+			Wave_Values wv;
+			wv.sin_value = 0;
+			wv.saw_value = 0;
+			wv.pwm_value = 0;
+			return wv;
+		}
+	}
+	else //settings for accelerating vvvf pattern
+	{
+		amplitude = get_Amplitude(wave_stat, 45);
+		expect_saw_angle_freq = wave_stat;
+		if (45 <= wave_stat)
+		{
+			pulse_mode = P_1;
+		}
+		else if (43 <= wave_stat)
+		{
+			pulse_mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 2.0 * (wave_stat - 43);
+		}
+		else if (37 <= wave_stat || (free_run && sin_angle_freq > 37 * M_2PI))
+			pulse_mode = P_3;
+		else if (32 <= wave_stat || (free_run && sin_angle_freq > 32 * M_2PI))
+			pulse_mode = P_5;
+		else if (25 <= wave_stat || (free_run && sin_angle_freq > 25 * M_2PI))
+			pulse_mode = P_9;
+		else if (14 <= wave_stat || (free_run && sin_angle_freq > 14 * M_2PI))
+			pulse_mode = P_15;
+		else if (7 <= wave_stat || (free_run && sin_angle_freq > 7 * M_2PI))
+			pulse_mode = P_27;
+		else if (5 <= wave_stat || (free_run && sin_angle_freq > 5 * M_2PI))
+			pulse_mode = P_45;
+		else
+		{
+			expect_saw_angle_freq = M_2PI * 200;
+			pulse_mode = Not_In_Sync;
+		}
+	}
+	return calculate_common(pulse_mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_toei_6300_3(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
+{
+	double amplitude = get_Amplitude(wave_stat, 60);
+	if (mascon_on == false && amplitude < 0.65)
+		amplitude = 0.0;
+
+	double expect_saw_angle_freq = sin_angle_freq * 10;
+	Pulse_Mode pulse_Mode = P_1;
+	if (60 <= wave_stat)
+		pulse_Mode = P_1;
+	else if (52.5 <= wave_stat || (free_run && sin_angle_freq > 52.5 * M_2PI))
+		pulse_Mode = P_3;
+	else if (15 <= wave_stat)
+	{
+		expect_saw_angle_freq = get_random_freq(1000, 20) * M_2PI;
+		pulse_Mode = Not_In_Sync;
+	}
+	else if (5 <= wave_stat)
+	{
+		double expect_saw_freq = 220 + (1000 - 220) / 10 * (wave_stat - 5);
+		expect_saw_angle_freq = get_random_freq((int)expect_saw_freq, 20) * M_2PI;
+		pulse_Mode = Not_In_Sync;
+	}
+	else if (wave_stat <= 3 && brake)
+	{
+		double expect_saw_freq = 205 + (220 - 205) / 3.0 * (wave_stat);
+		expect_saw_angle_freq = get_random_freq((int)expect_saw_freq, 20) * M_2PI;
+		pulse_Mode = Not_In_Sync;
+	}
+	else
+	{
+		expect_saw_angle_freq = get_random_freq(220, 20) * M_2PI;
+		pulse_Mode = Not_In_Sync;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
