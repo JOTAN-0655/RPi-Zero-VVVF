@@ -66,3 +66,5 @@ Wave_Values calculate_321_hitachi(bool brake,bool mascon_on, bool free_run, doub
 Wave_Values calculate_toyo_GTO(bool brake,bool mascon_on, bool free_run, double initial_phase, double wave_stat);
 Wave_Values calculate_tokyu_9000_hitachi_gto(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
 Wave_Values calculate_toei_6300_3(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
+Wave_Values calculate_keihan_13000_toyo_IGBT(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
+Wave_Values calculate_tokyuu_5000(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);

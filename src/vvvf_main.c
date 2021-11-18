@@ -194,7 +194,7 @@ void set_phase(char phase, int stat)
 	}
 }
 
-char total_modes = 18;
+char total_modes = 20;
 Wave_Values get_Value_mode(int mode, bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	if (mode == 0)
@@ -230,12 +230,16 @@ Wave_Values get_Value_mode(int mode, bool brake, bool mascon_on, bool free_run, 
 		return calculate_225_5100_mitsubishi(brake, mascon_on, free_run, initial_phase, wave_stat);
 	else if (mode == 15)
 		return calculate_321_hitachi(brake, mascon_on, free_run, initial_phase, wave_stat);
-	else if( mode == 16)
+	else if (mode == 16)
 		return calculate_toei_6300_3(brake, mascon_on, free_run, initial_phase, wave_stat);
-
 	else if (mode == 17)
-		return calculate_Famima(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_keihan_13000_toyo_IGBT(brake, mascon_on, free_run, initial_phase, wave_stat);
 	else if (mode == 18)
+		return calculate_tokyuu_5000(brake, mascon_on, free_run, initial_phase, wave_stat);
+
+	else if (mode == 19)
+		return calculate_Famima(brake, mascon_on, free_run, initial_phase, wave_stat);
+	else if (mode == 20)
 		return calculate_real_doremi(brake, mascon_on, free_run, initial_phase, wave_stat);
 
 	else
@@ -313,18 +317,21 @@ int pin_run(int mode)
 				brake = true;
 				mascon_off = false;
 			}
-			else{
+#ifdef ENABLE_MASCON_OFF
+			else
+			{
 				if (sin_new_angle_freq > 0)
 					mascon_off = true;
 				else
 					mascon_off = false;
-				
 			}
+#endif
 
 			if (sin_new_angle_freq > 942.4777960769379)
 				sin_new_angle_freq = 942.4777960769379;
 
-			if (mascon_count <= 0){
+			if (mascon_count <= 0)
+			{
 				all_off();
 				disconnect = true;
 			}
@@ -340,7 +347,7 @@ int pin_run(int mode)
 				disconnect = true;
 				all_off();
 			}
-			else if(mascon_count == 40000)
+			else if (mascon_count == 40000)
 			{
 				disconnect = false;
 				sin_time *= sin_angle_freq;
@@ -349,6 +356,11 @@ int pin_run(int mode)
 			}
 		}
 
+#ifndef ENABLE_MASCON_OFF
+	wave_stat = sin_angle_freq / M_2PI;
+#endif
+
+#ifdef ENABLE_MASCON_OFF
 		if (!mascon_off)
 		{
 			wave_stat = sin_angle_freq / M_2PI * mascon_count / 40000.0;
@@ -361,6 +373,7 @@ int pin_run(int mode)
 			if (--mascon_count < 0)
 				mascon_count = 0;
 		}
+#endif
 
 		if (digitalRead(button_R) == 0 && sin_angle_freq == 0)
 		{
