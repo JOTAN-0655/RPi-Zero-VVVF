@@ -152,7 +152,7 @@ int get_random_freq(int base_freq, int range)
 		random_freq = pre_saw_random_freq;
 	}
 	random_freq_move_count++;
-	if (random_freq_move_count == 100)
+	if (random_freq_move_count >= 100)
 		random_freq_move_count = 0;
 	return random_freq;
 }
@@ -1347,7 +1347,7 @@ Wave_Values calculate_tokyuu_1000_1500_IGBT(bool brake, bool mascon_on, bool fre
 		else
 		{
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = M_2PI * get_pattern_random((int)(400 + 180 / 38.3 * wave_stat), 600, 30000);
+			expect_saw_angle_freq = M_2PI * get_pattern_random((int)(400 + 180 / 38.3 * wave_stat), 600, 20000);
 		}
 	}
 	else
@@ -1368,7 +1368,7 @@ Wave_Values calculate_tokyuu_1000_1500_IGBT(bool brake, bool mascon_on, bool fre
 		else
 		{
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = M_2PI * get_pattern_random((int)(400 + 180 / 34.0 * wave_stat), 600, 30000);
+			expect_saw_angle_freq = M_2PI * get_pattern_random((int)(400 + 180 / 34.0 * wave_stat), 600, 20000);
 		}
 	}
 
