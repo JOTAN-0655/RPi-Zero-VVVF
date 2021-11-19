@@ -5,6 +5,8 @@
 #include "rpi_lib/delay.h"
 #include "rpi_lib/rpi_address.h"
 
+//#define ENABLE_MASCON_OFF
+
 //PIN DEFINE
 #define PIN_U_HIGH 5
 #define PIN_U_LOW 19
@@ -30,7 +32,6 @@
 #define M_PI 3.14159265358979
 #define M_2PI 6.28318530717958
 
-//#define DELAY_SEARCH
 
 char led_toggle_v = 0;
 void led_toggle()
@@ -194,7 +195,7 @@ void set_phase(char phase, int stat)
 	}
 }
 
-char total_modes = 20;
+char total_modes = 22;
 Wave_Values get_Value_mode(int mode, bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
 {
 	if (mode == 0)
@@ -236,10 +237,14 @@ Wave_Values get_Value_mode(int mode, bool brake, bool mascon_on, bool free_run, 
 		return calculate_keihan_13000_toyo_IGBT(brake, mascon_on, free_run, initial_phase, wave_stat);
 	else if (mode == 18)
 		return calculate_tokyuu_5000(brake, mascon_on, free_run, initial_phase, wave_stat);
-
 	else if (mode == 19)
-		return calculate_Famima(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_keio_8000_gto(brake, mascon_on, free_run, initial_phase, wave_stat);
 	else if (mode == 20)
+		return calculate_tokyuu_1000_1500_IGBT(brake, mascon_on, free_run, initial_phase, wave_stat);
+
+	else if (mode == 21)
+		return calculate_Famima(brake, mascon_on, free_run, initial_phase, wave_stat);
+	else if (mode == 22)
 		return calculate_real_doremi(brake, mascon_on, free_run, initial_phase, wave_stat);
 
 	else

@@ -44,6 +44,7 @@ extern int pre_saw_random_freq;
 
 void reset_all_variables();
 int get_random_freq(int base_freq, int range);
+double get_pattern_random(int lowest, int highest,int interval_count);
 
 Wave_Values calculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
 Wave_Values calculate_E231(bool brake,bool mascon_on, bool free_run,double initial_phase,double wave_stat);
@@ -68,3 +69,5 @@ Wave_Values calculate_tokyu_9000_hitachi_gto(bool brake, bool mascon_on, bool fr
 Wave_Values calculate_toei_6300_3(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
 Wave_Values calculate_keihan_13000_toyo_IGBT(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
 Wave_Values calculate_tokyuu_5000(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
+Wave_Values calculate_keio_8000_gto(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);
+Wave_Values calculate_tokyuu_1000_1500_IGBT(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat);

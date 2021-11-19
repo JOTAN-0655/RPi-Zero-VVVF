@@ -96,6 +96,8 @@ int get_Pulse_Num(Pulse_Mode mode)
 		return 9;
 	if (mode == P_10)
 		return 10;
+	if (mode == P_11)
+		return 15;
 	if (mode == P_12)
 		return 12;
 	if (mode == P_18)
@@ -155,6 +157,18 @@ int get_random_freq(int base_freq, int range)
 	return random_freq;
 }
 
+double get_pattern_random(int lowest, int highest, int interval_count)
+{
+	double random_freq = 0;
+	if (random_freq_move_count < interval_count / 2.0)
+		random_freq = lowest + (highest - lowest) / (interval_count / 2.0) * random_freq_move_count;
+	else
+		random_freq = highest + (lowest - highest) / (interval_count / 2.0) * (random_freq_move_count - interval_count / 2.0);
+	if (++random_freq_move_count > interval_count)
+		random_freq_move_count = 0;
+	return random_freq;
+}
+
 Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude)
 {
 
@@ -169,6 +183,10 @@ Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq
 	if (pulse_mode == P_7)
 		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
 	if (pulse_mode == SP_7)
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+	if (pulse_mode == P_11)
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+	if (pulse_mode == SP_11)
 		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
 
 	if (pulse_mode == Not_In_Sync)
@@ -1217,6 +1235,142 @@ Wave_Values calculate_tokyuu_5000(bool brake, bool mascon_on, bool free_run, dou
 
 	if (!mascon_on && free_run && wave_stat < 23)
 		amplitude = 0;
+
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_keio_8000_gto(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
+{
+
+	double amplitude;
+	double expect_saw_angle_freq = 1;
+	Pulse_Mode pulse_Mode = P_1;
+
+	if (brake)
+	{
+		amplitude = get_Amplitude(wave_stat, 68.2);
+		if (68.2 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (63.5 <= wave_stat && !free_run)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 6.0 * (wave_stat - 63.5);
+		}
+		else if ((free_run && sin_angle_freq > 63.5 * M_2PI) && wave_stat >= 30)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 34.0 * (wave_stat - 30);
+		}
+		else if (54.5 <= wave_stat || (free_run && sin_angle_freq > 54.5 * M_2PI))
+			pulse_Mode = P_3;
+		else if (41.2 <= wave_stat || (free_run && sin_angle_freq > 41.2 * M_2PI))
+			pulse_Mode = P_7;
+		else if (32.3 <= wave_stat || (free_run && sin_angle_freq > 32.3 * M_2PI))
+			pulse_Mode = P_11;
+		else if (21.0 <= wave_stat || (free_run && sin_angle_freq > 21.0 * M_2PI))
+			pulse_Mode = P_15;
+		else if (7.8 <= wave_stat || (free_run && sin_angle_freq > 7.8 * M_2PI))
+			pulse_Mode = P_21;
+		else
+		{
+			Wave_Values wv;
+			wv.sin_value = 0;
+			wv.saw_value = 0;
+			wv.pwm_value = 0;
+			return wv;
+		}
+	}
+	else
+	{
+		amplitude = get_Amplitude(wave_stat, 50);
+		if (50 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (48.7 <= wave_stat && !free_run)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 2.0 * (wave_stat - 48.7);
+		}
+		else if ((free_run && sin_angle_freq > 48.7 * M_2PI) && wave_stat >= 30)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 20.0 * (wave_stat - 30);
+		}
+		else if (41.2 <= wave_stat || (free_run && sin_angle_freq > 41.2 * M_2PI))
+			pulse_Mode = P_3;
+		else if (32.4 <= wave_stat || (free_run && sin_angle_freq > 38.4 * M_2PI))
+			pulse_Mode = P_7;
+		else if (29.5 <= wave_stat || (free_run && sin_angle_freq > 29.5 * M_2PI))
+			pulse_Mode = P_11;
+		else if (25.8 <= wave_stat || (free_run && sin_angle_freq > 25.8 * M_2PI))
+			pulse_Mode = P_15;
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			expect_saw_angle_freq = M_2PI * 400;
+		}
+	}
+
+	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
+}
+
+Wave_Values calculate_tokyuu_1000_1500_IGBT(bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
+{
+
+	double amplitude;
+	double expect_saw_angle_freq = 1;
+	Pulse_Mode pulse_Mode = P_1;
+
+	if (free_run && !mascon_on)
+	{
+		Wave_Values wv;
+		wv.sin_value = 0;
+		wv.saw_value = 0;
+		wv.pwm_value = 0;
+		return wv;
+	}
+
+	if (brake)
+	{
+		amplitude = get_Amplitude(wave_stat, 51);
+		if (51 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (50.8 <= wave_stat)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 0.2 * (wave_stat - 50.8);
+		}
+		else if (38.3 <= wave_stat && !(free_run && sin_angle_freq > 50 * M_2PI))
+		{
+			pulse_Mode = SP_15;
+			amplitude = 2 + (get_Amplitude(38.3, 50) - 2) / (50 - 38.3) * (50 - wave_stat);
+		}
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			expect_saw_angle_freq = M_2PI * get_pattern_random((int)(400 + 180 / 38.3 * wave_stat), 600, 30000);
+		}
+	}
+	else
+	{
+		amplitude = get_Amplitude(wave_stat, 47.3);
+		if (47.3 <= wave_stat)
+			pulse_Mode = P_1;
+		else if (44.4 <= wave_stat)
+		{
+			pulse_Mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 4.0 * (wave_stat - 44.4);
+		}
+		else if (35.8 <= wave_stat && !(free_run && sin_angle_freq > 44.4 * M_2PI))
+		{
+			pulse_Mode = SP_15;
+			amplitude = 1.3 + (get_Amplitude(35.8, 50) - 1.3) / (44.4 - 35.8) * (44.4 - wave_stat);
+		}
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			expect_saw_angle_freq = M_2PI * get_pattern_random((int)(400 + 180 / 34.0 * wave_stat), 600, 30000);
+		}
+	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, initial_phase, amplitude);
 }
