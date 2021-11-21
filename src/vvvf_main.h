@@ -21,6 +21,6 @@ char get_pin_H(char phase);
 char get_pin_L(char phase);
 void set_phase(char phase,int stat);
 
-Wave_Values get_Value_mode(int mode,bool brake, bool mascon_on, bool free_run,double initial_phase,double wave_stat);
+Wave_Values get_Value_mode(int mode,Control_Values cv);
 int pin_run(int mode);
 int main();

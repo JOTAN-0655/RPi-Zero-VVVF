@@ -196,59 +196,59 @@ void set_phase(char phase, int stat)
 }
 
 char total_modes = 22;
-Wave_Values get_Value_mode(int mode, bool brake, bool mascon_on, bool free_run, double initial_phase, double wave_stat)
+Wave_Values get_Value_mode(int mode, Control_Values cv)
 {
 	if (mode == 0)
-		return calculate_207(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_207(cv);
 	else if (mode == 1)
-		return calculate_toyo_GTO(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_toyo_GTO(cv);
 	else if (mode == 2)
-		return calculate_doremi(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_doremi(cv);
 	else if (mode == 3)
-		return calculate_E209(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_E209(cv);
 	else if (mode == 4)
-		return calculate_mitsubishi_gto(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_mitsubishi_gto(cv);
 	else if (mode == 5)
-		return calculate_tokyu_9000_hitachi_gto(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_tokyu_9000_hitachi_gto(cv);
 
 	else if (mode == 6)
-		return calculate_E231(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_E231(cv);
 	else if (mode == 7)
-		return calculate_9820_mitsubishi(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_9820_mitsubishi(cv);
 	else if (mode == 8)
-		return calculate_9820_hitachi(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_9820_hitachi(cv);
 	else if (mode == 9)
-		return calculate_E233(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_E233(cv);
 	else if (mode == 10)
-		return calculate_E235(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_E235(cv);
 	else if (mode == 11)
-		return calculate_toyo_IGBT(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_toyo_IGBT(cv);
 	else if (mode == 12)
-		return calculate_toubu_50050(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_toubu_50050(cv);
 	else if (mode == 13)
-		return calculate_207_1000_update(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_207_1000_update(cv);
 	else if (mode == 14)
-		return calculate_225_5100_mitsubishi(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_225_5100_mitsubishi(cv);
 	else if (mode == 15)
-		return calculate_321_hitachi(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_321_hitachi(cv);
 	else if (mode == 16)
-		return calculate_toei_6300_3(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_toei_6300_3(cv);
 	else if (mode == 17)
-		return calculate_keihan_13000_toyo_IGBT(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_keihan_13000_toyo_IGBT(cv);
 	else if (mode == 18)
-		return calculate_tokyuu_5000(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_tokyuu_5000(cv);
 	else if (mode == 19)
-		return calculate_keio_8000_gto(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_keio_8000_gto(cv);
 	else if (mode == 20)
-		return calculate_tokyuu_1000_1500_IGBT(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_tokyuu_1000_1500_IGBT(cv);
 
 	else if (mode == 21)
-		return calculate_Famima(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_Famima(cv);
 	else if (mode == 22)
-		return calculate_real_doremi(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_real_doremi(cv);
 
 	else
-		return calculate_silent(brake, mascon_on, free_run, initial_phase, wave_stat);
+		return calculate_silent(cv);
 }
 
 char count = 0;
@@ -274,9 +274,9 @@ int pin_run(int mode)
 	while (1)
 	{
 		start_system_time = get_systime();
-		end_targer_system_time = start_system_time + 15;
-		sin_time += 0.000015;
-		saw_time += 0.000015;
+		end_targer_system_time = start_system_time + 16;
+		sin_time += 0.000016;
+		saw_time += 0.000016;
 
 		int stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)
@@ -284,7 +284,8 @@ int pin_run(int mode)
 			if (!update_pin)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
-			Wave_Values wv = get_Value_mode(mode, brake, !mascon_off, mascon_count != 40000, initial_phase, wave_stat);
+			Control_Values cv = {brake,!mascon_off,mascon_count!=40000,initial_phase,wave_stat};
+			Wave_Values wv = get_Value_mode(mode, cv);
 			int require_stat = (int)wv.pwm_value;
 			if (i == 0)
 				stat_U = require_stat;
@@ -416,8 +417,7 @@ int pin_run(int mode)
 		{
 			button_press_count = 0;
 		}
-		while (end_targer_system_time > get_systime())
-			;
+		while (end_targer_system_time > get_systime());
 		debug_pin_toggle();
 	}
 	led_low();
