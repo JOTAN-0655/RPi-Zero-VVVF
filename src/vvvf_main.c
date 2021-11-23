@@ -5,7 +5,7 @@
 #include "rpi_lib/delay.h"
 #include "rpi_lib/rpi_address.h"
 
-//#define ENABLE_MASCON_OFF
+#define ENABLE_MASCON_OFF
 
 //PIN DEFINE
 #define PIN_U_HIGH 5
@@ -254,13 +254,15 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 char count = 0;
 char do_frequency_change = 1, update_pin = 1;
 unsigned int button_press_count = 0;
+
+int mascon_off_div = 4000;
+
 int pin_run(int mode)
 {
 	int return_val = 0;
 
 	double wave_stat = 0;
 	bool brake = false;
-	int mascon_count = 40000;
 	bool mascon_off = false;
 
 	unsigned long long start_system_time = 0, end_targer_system_time = 0;
@@ -284,7 +286,7 @@ int pin_run(int mode)
 			if (!update_pin)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
-			Control_Values cv = {brake,!mascon_off,mascon_count!=40000,initial_phase,wave_stat};
+			Control_Values cv = {brake,!mascon_off, sin_angle_freq / M_2PI != wave_stat ,initial_phase,wave_stat};
 			Wave_Values wv = get_Value_mode(mode, cv);
 			int require_stat = (int)wv.pwm_value;
 			if (i == 0)
@@ -336,7 +338,7 @@ int pin_run(int mode)
 			if (sin_new_angle_freq > 942.4777960769379)
 				sin_new_angle_freq = 942.4777960769379;
 
-			if (mascon_count <= 0)
+			if (wave_stat <= 0)
 			{
 				all_off();
 				disconnect = true;
@@ -349,11 +351,11 @@ int pin_run(int mode)
 				sin_time = 0;
 				saw_time = 0;
 				sin_angle_freq = 0;
-				mascon_count = 40000;
+				wave_stat = 0;
 				disconnect = true;
 				all_off();
 			}
-			else if (mascon_count == 40000)
+			else if (sin_angle_freq / M_2PI == wave_stat)
 			{
 				disconnect = false;
 				sin_time *= sin_angle_freq;
@@ -363,22 +365,21 @@ int pin_run(int mode)
 		}
 
 #ifndef ENABLE_MASCON_OFF
-	wave_stat = sin_angle_freq / M_2PI;
+		wave_stat = sin_angle_freq / M_2PI;
 #endif
 
 #ifdef ENABLE_MASCON_OFF
 		if (!mascon_off)
-		{
-			wave_stat = sin_angle_freq / M_2PI * mascon_count / 40000.0;
-			if (++mascon_count > 40000)
-				mascon_count = 40000;
-		}
-		else
-		{
-			wave_stat = sin_angle_freq / M_2PI * mascon_count / 40000.0;
-			if (--mascon_count < 0)
-				mascon_count = 0;
-		}
+        {
+            wave_stat += M_2PI / (double)mascon_off_div;
+            if (sin_angle_freq / M_2PI < wave_stat)
+				wave_stat = sin_angle_freq / M_2PI;
+        }
+        else
+        {
+            wave_stat -= M_2PI / (double)mascon_off_div;
+            if (wave_stat < 0) wave_stat = 0;
+        }
 #endif
 
 		if (digitalRead(button_R) == 0 && sin_angle_freq == 0)
