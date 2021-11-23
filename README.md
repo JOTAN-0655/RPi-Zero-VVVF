@@ -1,4 +1,4 @@
-# raspi-zero-vvvf 2-level-only
+# raspi-zero-vvvf(2-level-only)
 Making VVVF inverter with raspberry pi zero.
 This code is for baremetal on raspberry pi zero.
 
