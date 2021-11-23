@@ -1,6 +1,7 @@
 # raspi-zero-vvvf
 Making VVVF inverter with raspberry pi zero.
 This code is for baremetal on raspberry pi zero.
+This `main` repository is for 2 and 3 level vvvf.
 
 # terms of use
 ## disclaimer
@@ -54,12 +55,20 @@ arm_freq=1200
 
 # VVVF pin out
 This number is BCM GPIO number.
- - PIN_U_HIGH 5
- - PIN_U_LOW 19
- - PIN_V_HIGH 6
- - PIN_V_LOW 26
- - PIN_W_HIGH 13
- - PIN_W_LOW 21
+- PIN_U_HIGH_2 12
+- PIN_U_HIGH_1 13
+- PIN_U_LOW_1 11
+- PIN_U_LOW_2 21
+
+- PIN_V_HIGH_2 16
+- PIN_V_HIGH_1 6
+- PIN_V_LOW_1 9
+- PIN_V_LOW_2 26
+
+- PIN_W_HIGH_2 20
+- PIN_W_HIGH_1 5
+- PIN_W_LOW_1 10
+- PIN_W_LOW_2 19
 
 # Function pin out
 This number is BCM GPIO number
