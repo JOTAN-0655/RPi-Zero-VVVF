@@ -8,14 +8,20 @@
 #define ENABLE_MASCON_OFF
 
 //PIN DEFINE
-#define PIN_U_HIGH 5
-#define PIN_U_LOW 19
+#define PIN_U_HIGH_2 10
+#define PIN_U_HIGH_1 9
+#define PIN_U_LOW_1 11
+#define PIN_U_LOW_2 5
 
-#define PIN_V_HIGH 6
-#define PIN_V_LOW 26
+#define PIN_V_HIGH_2 6
+#define PIN_V_HIGH_1 13
+#define PIN_V_LOW_1 19
+#define PIN_V_LOW_2 26
 
-#define PIN_W_HIGH 13
-#define PIN_W_LOW 21
+#define PIN_W_HIGH_2 21
+#define PIN_W_HIGH_1 20
+#define PIN_W_LOW_1 16
+#define PIN_W_LOW_2 12
 
 #define mascon_1 4
 #define mascon_2 17
@@ -73,21 +79,38 @@ void debug_pin_low()
 
 void all_off()
 {
-	digitalWrite(PIN_U_HIGH, LOW);
-	digitalWrite(PIN_V_HIGH, LOW);
-	digitalWrite(PIN_W_HIGH, LOW);
-	digitalWrite(PIN_U_LOW, LOW);
-	digitalWrite(PIN_V_LOW, LOW);
-	digitalWrite(PIN_W_LOW, LOW);
+	digitalWrite(PIN_U_HIGH_2, LOW);
+	digitalWrite(PIN_U_HIGH_1, LOW);
+	digitalWrite(PIN_U_LOW_1, LOW);
+	digitalWrite(PIN_U_LOW_2, LOW);
+	
+	digitalWrite(PIN_V_HIGH_2, LOW);
+	digitalWrite(PIN_V_HIGH_1, LOW);
+	digitalWrite(PIN_V_LOW_1, LOW);
+	digitalWrite(PIN_V_LOW_2, LOW);
+
+	digitalWrite(PIN_W_HIGH_2, LOW);
+	digitalWrite(PIN_W_HIGH_1, LOW);
+	digitalWrite(PIN_W_LOW_1, LOW);
+	digitalWrite(PIN_W_LOW_2, LOW);
 }
+
 void initialize_vvvf_pin()
 {
-	pinMode(PIN_U_HIGH, OUTPUT);
-	pinMode(PIN_V_HIGH, OUTPUT);
-	pinMode(PIN_W_HIGH, OUTPUT);
-	pinMode(PIN_U_LOW, OUTPUT);
-	pinMode(PIN_V_LOW, OUTPUT);
-	pinMode(PIN_W_LOW, OUTPUT);
+	pinMode(PIN_U_HIGH_2, OUTPUT);
+	pinMode(PIN_U_HIGH_1, OUTPUT);
+	pinMode(PIN_U_LOW_1, OUTPUT);
+	pinMode(PIN_U_LOW_2, OUTPUT);
+	
+	pinMode(PIN_V_HIGH_2, OUTPUT);
+	pinMode(PIN_V_HIGH_1, OUTPUT);
+	pinMode(PIN_V_LOW_1, OUTPUT);
+	pinMode(PIN_V_LOW_2, OUTPUT);
+
+	pinMode(PIN_W_HIGH_2, OUTPUT);
+	pinMode(PIN_W_HIGH_1, OUTPUT);
+	pinMode(PIN_W_LOW_1, OUTPUT);
+	pinMode(PIN_W_LOW_2, OUTPUT);
 
 	pinMode(mascon_1, INPUT);
 	pinMode(mascon_2, INPUT);
@@ -136,62 +159,82 @@ void set_phase_stat(char phase, int stat)
 		pre_phase_2_stat = stat;
 }
 
-char get_pin_H(char phase)
+char get_pin_H_2(char phase)
 {
-	switch (phase)
-	{
-	case 0:
-		return PIN_U_HIGH;
-	case 1:
-		return PIN_V_HIGH;
-	default:
-		return PIN_W_HIGH;
-	}
+	if(phase == 0) return PIN_U_HIGH_2;
+	else if(phase == 1) return PIN_V_HIGH_2;
+	else return PIN_W_HIGH_2;
 }
 
-char get_pin_L(char phase)
+char get_pin_L_2(char phase)
 {
-	switch (phase)
-	{
-	case 0:
-		return PIN_U_LOW;
-	case 1:
-		return PIN_V_LOW;
-	default:
-		return PIN_W_LOW;
-	}
+	if(phase == 0) return PIN_U_LOW_2;
+	else if(phase == 1) return PIN_V_LOW_2;
+	else return PIN_W_LOW_2;
 }
-// stat = 1 => pin_H = 1,pin_L=0
-// stat = 0 => pin_H = 0,pin_L=0
-// stat = -1 => pin_H = 0,pin_L=1
+
+char get_pin_H_1(char phase)
+{
+	if(phase == 0) return PIN_U_HIGH_1;
+	else if(phase == 1) return PIN_V_HIGH_1;
+	else return PIN_W_HIGH_1;
+}
+
+char get_pin_L_1(char phase)
+{
+	if(phase == 0) return PIN_U_LOW_1;
+	else if(phase == 1) return PIN_V_LOW_1;
+	else return PIN_W_LOW_1;
+}
+
+/*
+	stat = 0 => PIN_H_1/2 = 0 , PIN_L_1/2 = 1
+	stat = 1 => PIN_H/L_2 = 0 , PIN_H/L_2 = 1
+	stat = 2 => PIN_H_1/2 = 1 , PIN_L_1/2 = 0
+*/
 void set_phase(char phase, int stat)
 {
 	if (ignore_pin_change == 1)
 		return;
 	if (get_phase_stat(phase) == stat)
 		return;
-	char pin_H = get_pin_H(phase);
-	char pin_L = get_pin_L(phase);
+
+	char pin_H_2 = get_pin_H_2(phase);
+	char pin_L_2 = get_pin_L_2(phase);
+	char pin_H_1 = get_pin_H_1(phase);
+	char pin_L_1 = get_pin_L_1(phase);
+
 	set_phase_stat(phase, stat);
 	if (stat == 0)
 	{
-		digitalWrite(pin_H, LOW);
-		digitalWrite(pin_L, LOW);
+		digitalWrite(pin_H_2, LOW);
+		digitalWrite(pin_H_1, LOW);
+
+		digitalWrite(pin_L_1, HIGH);
+		digitalWrite(pin_L_2, HIGH);
 	}
-	else if (stat == 1)
-	{
-		digitalWrite(pin_H, HIGH);
-		digitalWrite(pin_L, LOW);
+	else if(stat == 1){
+		digitalWrite(pin_H_2, LOW);
+		digitalWrite(pin_H_1, HIGH);
+
+		digitalWrite(pin_L_1, HIGH);
+		digitalWrite(pin_L_2, LOW);
 	}
-	else if (stat == -1)
+	else if (stat == 2)
 	{
-		digitalWrite(pin_H, LOW);
-		digitalWrite(pin_L, HIGH);
+		digitalWrite(pin_H_2, HIGH);
+		digitalWrite(pin_H_1, HIGH);
+
+		digitalWrite(pin_L_1, LOW);
+		digitalWrite(pin_L_2, LOW);
 	}
 	else
 	{
-		digitalWrite(pin_H, LOW);
-		digitalWrite(pin_L, LOW);
+		digitalWrite(pin_H_2, LOW);
+		digitalWrite(pin_H_1, LOW);
+
+		digitalWrite(pin_L_1, LOW);
+		digitalWrite(pin_L_2, LOW);
 	}
 }
 
@@ -288,7 +331,7 @@ int pin_run(int mode)
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
 			Control_Values cv = {brake,!mascon_off, sin_angle_freq / M_2PI != wave_stat ,initial_phase,wave_stat};
 			Wave_Values wv = get_Value_mode(mode, cv);
-			int require_stat = (int)wv.pwm_value;
+			int require_stat = wv.pwm_value;
 			if (i == 0)
 				stat_U = require_stat;
 			else if (i == 1)

@@ -7,7 +7,6 @@
 #define M_PI_2 1.57079632679489661923
 #define M_2_PI 0.636619772367581343076
 
-
 //function caliculation
 double get_saw_value_simple(double x)
 {
@@ -30,14 +29,14 @@ double get_sin_value(double time, double angle_frequency, double initial_phase, 
 	return sin(time * angle_frequency + initial_phase) * amplitude;
 }
 
-double get_pwm_value(double sin_value, double saw_value)
+int get_pwm_value(double sin_value, double saw_value)
 {
 	if (disconnect)
 		return 0;
 	if (sin_value - saw_value > 0)
 		return 1;
 	else
-		return -1;
+		return 0;
 }
 
 Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage, bool saw_oppose)
@@ -48,7 +47,7 @@ Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_pha
 		saw = -saw;
 	double pwm = ((sin - saw > 0) ? 1 : -1) * voltage;
 	double nega_saw = (saw > 0) ? saw - 1 : saw + 1;
-	double gate = get_pwm_value(pwm, nega_saw);
+	int gate = get_pwm_value(pwm, nega_saw) * 2;
 	Wave_Values wv;
 	wv.sin_value = pwm;
 	wv.saw_value = nega_saw;
@@ -63,7 +62,7 @@ Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initi
 	if (saw_oppose)
 		saw = -saw;
 	double pwm = (saw > 0) ? voltage : -voltage;
-	double gate = get_pwm_value(pwm, carrier_saw);
+	int gate = get_pwm_value(pwm, carrier_saw) * 2;
 	Wave_Values wv;
 	wv.sin_value = saw;
 	wv.saw_value = carrier_saw;
@@ -170,6 +169,33 @@ double get_pattern_random(int lowest, int highest, int interval_count)
 	return random_freq;
 }
 
+Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,bool dipolar)
+{
+	if (pulse_mode == Not_In_Sync)
+		saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
+	else
+	{
+		expect_saw_angle_freq = sin_angle_freq * get_Pulse_Num(pulse_mode);
+		saw_time = sin_time;
+	}
+	saw_angle_freq = expect_saw_angle_freq;
+
+	double sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
+
+	double saw_value = get_saw_value(saw_time, saw_angle_freq, 0);
+	if ((int)pulse_mode > (int)P_61)
+		saw_value = -saw_value;
+
+	double changed_saw = (dipolar) ? 2 : 0.5 * saw_value;
+	int pwm_value = get_pwm_value(sin_value, changed_saw + 0.5) + get_pwm_value(sin_value, changed_saw - 0.5);
+
+	Wave_Values wv;
+	wv.sin_value = sin_value;
+	wv.saw_value = saw_value;
+	wv.pwm_value = pwm_value;
+	return wv;
+}
+
 Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude)
 {
 
@@ -205,7 +231,7 @@ Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq
 	if ((int)pulse_mode > (int)P_61)
 		saw_value = -saw_value;
 
-	double pwm_value = get_pwm_value(sin_value, saw_value);
+	int pwm_value = get_pwm_value(sin_value, saw_value) * 2;
 
 	Wave_Values wv;
 	wv.sin_value = sin_value;
@@ -361,7 +387,7 @@ Wave_Values calculate_E235(Control_Values cv)
 	double amplitude = get_Amplitude(cv.wave_stat, 54);
 
 	double sin_value = get_sin_value(sin_time, sin_angle_freq, cv.initial_phase, amplitude);
-	double saw_value, pwm_value;
+	double saw_value;
 	if (cv.wave_stat > 54)
 	{
 
@@ -396,7 +422,7 @@ Wave_Values calculate_E235(Control_Values cv)
 			random_freq_move_count = 0;
 	}
 
-	pwm_value = get_pwm_value(sin_value, saw_value);
+	int pwm_value = get_pwm_value(sin_value, saw_value) * 2;
 
 	Wave_Values wv;
 	wv.sin_value = sin_value;
