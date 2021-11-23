@@ -8,20 +8,20 @@
 #define ENABLE_MASCON_OFF
 
 //PIN DEFINE
-#define PIN_U_HIGH_2 10
-#define PIN_U_HIGH_1 9
+#define PIN_U_HIGH_2 12
+#define PIN_U_HIGH_1 13
 #define PIN_U_LOW_1 11
-#define PIN_U_LOW_2 5
+#define PIN_U_LOW_2 21
 
-#define PIN_V_HIGH_2 6
-#define PIN_V_HIGH_1 13
-#define PIN_V_LOW_1 19
+#define PIN_V_HIGH_2 16
+#define PIN_V_HIGH_1 6
+#define PIN_V_LOW_1 9
 #define PIN_V_LOW_2 26
 
-#define PIN_W_HIGH_2 21
-#define PIN_W_HIGH_1 20
-#define PIN_W_LOW_1 16
-#define PIN_W_LOW_2 12
+#define PIN_W_HIGH_2 20
+#define PIN_W_HIGH_1 5
+#define PIN_W_LOW_1 10
+#define PIN_W_LOW_2 19
 
 #define mascon_1 4
 #define mascon_2 17
