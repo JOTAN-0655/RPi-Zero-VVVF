@@ -251,35 +251,35 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 		return calculate_mitsubishi_gto(cv);
 	else if (mode == 5)
 		return calculate_tokyu_9000_hitachi_gto(cv);
-
 	else if (mode == 6)
-		return calculate_E231(cv);
-	else if (mode == 7)
-		return calculate_9820_mitsubishi(cv);
-	else if (mode == 8)
-		return calculate_9820_hitachi(cv);
-	else if (mode == 9)
-		return calculate_E233(cv);
-	else if (mode == 10)
-		return calculate_E235(cv);
-	else if (mode == 11)
-		return calculate_toyo_IGBT(cv);
-	else if (mode == 12)
-		return calculate_toubu_50050(cv);
-	else if (mode == 13)
-		return calculate_207_1000_update(cv);
-	else if (mode == 14)
-		return calculate_225_5100_mitsubishi(cv);
-	else if (mode == 15)
-		return calculate_321_hitachi(cv);
-	else if (mode == 16)
-		return calculate_toei_6300_3(cv);
-	else if (mode == 17)
-		return calculate_keihan_13000_toyo_IGBT(cv);
-	else if (mode == 18)
-		return calculate_tokyuu_5000(cv);
-	else if (mode == 19)
 		return calculate_keio_8000_gto(cv);
+
+	else if (mode == 7)
+		return calculate_E231(cv);
+	else if (mode == 8)
+		return calculate_9820_mitsubishi(cv);
+	else if (mode == 9)
+		return calculate_9820_hitachi(cv);
+	else if (mode == 10)
+		return calculate_E233(cv);
+	else if (mode == 11)
+		return calculate_E235(cv);
+	else if (mode == 12)
+		return calculate_toyo_IGBT(cv);
+	else if (mode == 13)
+		return calculate_toubu_50050(cv);
+	else if (mode == 14)
+		return calculate_207_1000_update(cv);
+	else if (mode == 15)
+		return calculate_225_5100_mitsubishi(cv);
+	else if (mode == 16)
+		return calculate_321_hitachi(cv);
+	else if (mode == 17)
+		return calculate_toei_6300_3(cv);
+	else if (mode == 18)
+		return calculate_keihan_13000_toyo_IGBT(cv);
+	else if (mode == 19)
+		return calculate_tokyuu_5000(cv);
 	else if (mode == 20)
 		return calculate_tokyuu_1000_1500_IGBT(cv);
 
