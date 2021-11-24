@@ -2,15 +2,10 @@
 #include "vvvf_main.h"
 #include "my_math.h"
 
-#define M_2PI 6.28318530717958
-#define M_PI 3.14159265358979
-#define M_PI_2 1.57079632679489661923
-#define M_2_PI 0.636619772367581343076
-
 //function caliculation
 double get_saw_value_simple(double x)
 {
-	double fixed_x = x - (double)((int)(x / M_2PI) * M_2PI);
+	double fixed_x = x - (double)((int)(x * M_1_2PI) * M_2PI);
 	if (0 <= fixed_x && fixed_x < M_PI_2)
 		return M_2_PI * fixed_x;
 	else if (M_PI_2 <= fixed_x && fixed_x < 3.0 * M_PI_2)
@@ -160,10 +155,10 @@ int get_random_freq(int base_freq, int range)
 double get_pattern_random(int lowest, int highest, int interval_count)
 {
 	double random_freq = 0;
-	if (random_freq_move_count < interval_count / 2.0)
-		random_freq = lowest + (highest - lowest) / (interval_count / 2.0) * random_freq_move_count;
+	if (random_freq_move_count < interval_count * 0.5)
+		random_freq = lowest + (highest - lowest) / (interval_count * 0.5) * random_freq_move_count;
 	else
-		random_freq = highest + (lowest - highest) / (interval_count / 2.0) * (random_freq_move_count - interval_count / 2.0);
+		random_freq = highest + (lowest - highest) / (interval_count * 0.5) * (random_freq_move_count - interval_count * 0.5);
 	if (++random_freq_move_count > interval_count)
 		random_freq_move_count = 0;
 	return random_freq;
@@ -1009,10 +1004,10 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 				return wv;
 			}
 			pulse_Mode = Not_In_Sync;
-			double base_freq = 260;
+			int base_freq = 260;
 			if (cv.wave_stat > 3)
-				base_freq = (260 + (365 - 260) / 25.0 * (cv.wave_stat - 3));
-			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
+				base_freq = (int)(260 + (365 - 260) / 25.0 * (cv.wave_stat - 3));
+			expect_saw_angle_freq = get_random_freq(base_freq, 30) * M_2PI;
 		}
 	}
 	else
@@ -1042,10 +1037,10 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 		{
 			pulse_Mode = Not_In_Sync;
 
-			double base_freq = 260;
+			int base_freq = 260;
 			if (cv.wave_stat > 3)
-				base_freq = (260 + (365 - 260) / 23.0 * (cv.wave_stat - 3));
-			expect_saw_angle_freq = get_random_freq((int)base_freq, 30) * M_2PI;
+				base_freq = (int)(260 + (365 - 260) / 23.0 * (cv.wave_stat - 3));
+			expect_saw_angle_freq = get_random_freq(base_freq, 30) * M_2PI;
 		}
 	}
 

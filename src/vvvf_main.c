@@ -1,5 +1,6 @@
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
+#include "my_math.h"
 
 #include "rpi_lib/gpio.h"
 #include "rpi_lib/delay.h"
@@ -10,17 +11,17 @@
 //PIN DEFINE
 #define PIN_U_HIGH_2 12
 #define PIN_U_HIGH_1 13
-#define PIN_U_LOW_1 11
+#define PIN_U_LOW_1 0
 #define PIN_U_LOW_2 21
 
 #define PIN_V_HIGH_2 16
 #define PIN_V_HIGH_1 6
-#define PIN_V_LOW_1 9
+#define PIN_V_LOW_1 11
 #define PIN_V_LOW_2 26
 
 #define PIN_W_HIGH_2 20
 #define PIN_W_HIGH_1 5
-#define PIN_W_LOW_1 10
+#define PIN_W_LOW_1 9
 #define PIN_W_LOW_2 19
 
 #define mascon_1 4
@@ -34,9 +35,6 @@
 
 #define debug_PIN 25
 #define LED_PIN 47
-
-#define M_PI 3.14159265358979
-#define M_2PI 6.28318530717958
 
 
 char led_toggle_v = 0;
@@ -298,7 +296,7 @@ char count = 0;
 char do_frequency_change = 1, update_pin = 1;
 unsigned int button_press_count = 0;
 
-int mascon_off_div = 4000;
+int mascon_off_div = 1000;
 
 int pin_run(int mode)
 {
@@ -319,9 +317,9 @@ int pin_run(int mode)
 	while (1)
 	{
 		start_system_time = get_systime();
-		end_targer_system_time = start_system_time + 16;
-		sin_time += 0.000016;
-		saw_time += 0.000016;
+		end_targer_system_time = start_system_time + 15;
+		sin_time += 0.000015;
+		saw_time += 0.000015;
 
 		int stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)
@@ -329,7 +327,7 @@ int pin_run(int mode)
 			if (!update_pin)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
-			Control_Values cv = {brake,!mascon_off, sin_angle_freq / M_2PI != wave_stat ,initial_phase,wave_stat};
+			Control_Values cv = {brake,!mascon_off, sin_angle_freq * M_1_2PI != wave_stat ,initial_phase,wave_stat};
 			Wave_Values wv = get_Value_mode(mode, cv);
 			int require_stat = wv.pwm_value;
 			if (i == 0)
@@ -350,6 +348,7 @@ int pin_run(int mode)
 		set_phase(0, stat_U);
 		set_phase(1, stat_V);
 		set_phase(2, stat_W);
+
 		count++;
 		if (count % 8 == 0 && do_frequency_change)
 		{
@@ -398,7 +397,7 @@ int pin_run(int mode)
 				disconnect = true;
 				all_off();
 			}
-			else if (sin_angle_freq / M_2PI == wave_stat)
+			else if (sin_angle_freq * M_1_2PI == wave_stat)
 			{
 				disconnect = false;
 				sin_time *= sin_angle_freq;
@@ -408,19 +407,19 @@ int pin_run(int mode)
 		}
 
 #ifndef ENABLE_MASCON_OFF
-		wave_stat = sin_angle_freq / M_2PI;
+		wave_stat = sin_angle_freq * M_1_2PI;
 #endif
 
 #ifdef ENABLE_MASCON_OFF
 		if (!mascon_off)
         {
-            wave_stat += M_2PI / (double)mascon_off_div;
-            if (sin_angle_freq / M_2PI < wave_stat)
-				wave_stat = sin_angle_freq / M_2PI;
+            wave_stat += 1 / (double)mascon_off_div;
+            if (sin_angle_freq * M_1_2PI < wave_stat)
+				wave_stat = sin_angle_freq * M_1_2PI;
         }
-        else
+        else if(wave_stat > 0)
         {
-            wave_stat -= M_2PI / (double)mascon_off_div;
+            wave_stat -= 1 / (double)mascon_off_div;
             if (wave_stat < 0) wave_stat = 0;
         }
 #endif
