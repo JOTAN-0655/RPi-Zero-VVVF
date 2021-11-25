@@ -236,7 +236,7 @@ void set_phase(char phase, int stat)
 	}
 }
 
-char total_modes = 22;
+char total_modes = 23;
 Wave_Values get_Value_mode(int mode, Control_Values cv)
 {
 	if (mode == 0)
@@ -283,9 +283,12 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 	else if (mode == 20)
 		return calculate_tokyuu_1000_1500_IGBT(cv);
 
-	else if (mode == 21)
-		return calculate_Famima(cv);
+	else if(mode == 21)
+		return calculate_jre_209_mitsubishi_gto(cv);
+
 	else if (mode == 22)
+		return calculate_Famima(cv);
+	else if (mode == 23)
 		return calculate_real_doremi(cv);
 
 	else
@@ -317,9 +320,9 @@ int pin_run(int mode)
 	while (1)
 	{
 		start_system_time = get_systime();
-		end_targer_system_time = start_system_time + 15;
-		sin_time += 0.000015;
-		saw_time += 0.000015;
+		end_targer_system_time = start_system_time + 20;
+		sin_time += 0.000020;
+		saw_time += 0.000020;
 
 		int stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)

@@ -164,7 +164,7 @@ double get_pattern_random(int lowest, int highest, int interval_count)
 	return random_freq;
 }
 
-Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,bool dipolar)
+Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude, bool dipolar)
 {
 	if (pulse_mode == Not_In_Sync)
 		saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
@@ -1481,4 +1481,62 @@ Wave_Values calculate_E233_3000(Control_Values cv)
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+}
+
+Wave_Values calculate_jre_209_mitsubishi_gto(Control_Values cv)
+{
+	double amplitude = 0;
+	double expect_saw_angle_freq = 1;
+	Pulse_Mode pulse_Mode = P_1;
+
+	if (cv.brake)
+	{
+		amplitude = get_Amplitude(cv.wave_stat, 68);
+		if (59 <= cv.wave_stat)
+		{
+			pulse_Mode = P_1;
+			amplitude = get_Amplitude(cv.wave_stat, 72) + get_Amplitude(cv.wave_stat - 59, 15);
+		}
+		else if (49 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 49 * M_2PI))
+			pulse_Mode = P_3;
+		else if (40 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 40 * M_2PI))
+			pulse_Mode = P_9;
+		else if (19 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 19 * M_2PI))
+			pulse_Mode = P_21;
+		else if (7 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 7 * M_2PI))
+			pulse_Mode = P_33;
+		else
+		{
+			Wave_Values wv;
+			wv.sin_value = 0;
+			wv.saw_value = 0;
+			wv.pwm_value = 0;
+			return wv;
+		}
+	}
+	else
+	{
+		amplitude = get_Amplitude(cv.wave_stat, 62);
+		if (53 <= cv.wave_stat)
+		{
+			pulse_Mode = P_1;
+			amplitude = get_Amplitude(cv.wave_stat, 66) + get_Amplitude(cv.wave_stat - 53, 15);
+		}
+		else if (46 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 46 * M_2PI))
+			pulse_Mode = P_3;
+		else if (30 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 30 * M_2PI))
+			pulse_Mode = P_9;
+		else if (19 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 19 * M_2PI))
+			pulse_Mode = P_21;
+		else if (9 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 9 * M_2PI))
+			pulse_Mode = P_33;
+		else if (2 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 2 * M_2PI))
+			pulse_Mode = P_57;
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			expect_saw_angle_freq = M_2PI * 114;
+		}
+	}
+	return calculate_three_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude, false);
 }

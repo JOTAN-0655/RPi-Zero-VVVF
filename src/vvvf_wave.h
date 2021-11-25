@@ -90,3 +90,4 @@ Wave_Values calculate_tokyuu_5000(Control_Values cv);
 Wave_Values calculate_keio_8000_gto(Control_Values cv);
 Wave_Values calculate_tokyuu_1000_1500_IGBT(Control_Values cv);
 Wave_Values calculate_E233_3000(Control_Values cv);
+Wave_Values calculate_jre_209_mitsubishi_gto(Control_Values cv);
