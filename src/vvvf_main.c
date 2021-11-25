@@ -6,7 +6,7 @@
 #include "rpi_lib/delay.h"
 #include "rpi_lib/rpi_address.h"
 
-#define ENABLE_MASCON_OFF
+//#define ENABLE_MASCON_OFF
 
 //PIN DEFINE
 #define PIN_U_HIGH_2 12
@@ -236,7 +236,7 @@ void set_phase(char phase, int stat)
 	}
 }
 
-char total_modes = 23;
+char total_modes = 22;
 Wave_Values get_Value_mode(int mode, Control_Values cv)
 {
 	if (mode == 0)
@@ -283,12 +283,14 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 	else if (mode == 20)
 		return calculate_tokyuu_1000_1500_IGBT(cv);
 
+	/*
 	else if(mode == 21)
 		return calculate_jre_209_mitsubishi_gto(cv);
+	*/
 
-	else if (mode == 22)
+	else if (mode == 21)
 		return calculate_Famima(cv);
-	else if (mode == 23)
+	else if (mode == 22)
 		return calculate_real_doremi(cv);
 
 	else
@@ -320,9 +322,9 @@ int pin_run(int mode)
 	while (1)
 	{
 		start_system_time = get_systime();
-		end_targer_system_time = start_system_time + 20;
-		sin_time += 0.000020;
-		saw_time += 0.000020;
+		end_targer_system_time = start_system_time + 17;
+		sin_time += 0.000017;
+		saw_time += 0.000017;
 
 		int stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)

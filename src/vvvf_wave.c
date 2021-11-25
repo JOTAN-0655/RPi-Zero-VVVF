@@ -181,7 +181,7 @@ Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle
 	if ((int)pulse_mode > (int)P_61)
 		saw_value = -saw_value;
 
-	double changed_saw = (dipolar) ? 2 : 0.5 * saw_value;
+	double changed_saw = (dipolar == 1) ? 2 : 0.5 * saw_value;
 	int pwm_value = get_pwm_value(sin_value, changed_saw + 0.5) + get_pwm_value(sin_value, changed_saw - 0.5);
 
 	Wave_Values wv;
