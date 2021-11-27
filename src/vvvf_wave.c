@@ -270,40 +270,67 @@ Wave_Values calculate_E231(Control_Values cv)
 
 Wave_Values calculate_207(Control_Values cv)
 {
-	double amplitude = get_Amplitude(cv.wave_stat, 60);
+	double amplitude = 0;
 
 	double expect_saw_angle_freq = 0;
 	Pulse_Mode pulse_mode;
-	if (60 <= cv.wave_stat)
-		pulse_mode = P_1;
-	else if (53 <= cv.wave_stat)
-		pulse_mode = P_3;
-	else if (44 <= cv.wave_stat)
-		pulse_mode = P_5;
-	else if (31 <= cv.wave_stat)
-		pulse_mode = P_9;
-	else if (14 <= cv.wave_stat)
-		pulse_mode = P_15;
-	else if (cv.wave_stat < 14 && !cv.brake)
-	{
-		expect_saw_angle_freq = M_2PI * 365;
-		pulse_mode = Not_In_Sync;
-	}
-	else if (8 < cv.wave_stat && cv.wave_stat < 14 && cv.brake)
-	{
 
-		expect_saw_angle_freq = sin_angle_freq * 27;
-		pulse_mode = P_27;
-		saw_time = sin_time;
+	if (!cv.brake)
+	{
+		amplitude = get_Amplitude(cv.wave_stat, 60);
+		if (60 <= cv.wave_stat)
+			pulse_mode = P_1;
+		else if (53 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 53 * M_2PI))
+		{
+			if (cv.free_run)
+				amplitude = get_Amplitude(cv.wave_stat, 50);
+			if (amplitude > 0.97)
+				amplitude = 0.97;
+			pulse_mode = P_3;
+		}
+		else if (44 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 44 * M_2PI))
+			pulse_mode = P_5;
+		else if (31 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 31 * M_2PI))
+			pulse_mode = P_9;
+		else if (14 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 14 * M_2PI))
+			pulse_mode = P_15;
+		else
+		{
+			expect_saw_angle_freq = M_2PI * 365;
+			pulse_mode = Not_In_Sync;
+		}
 	}
 	else
 	{
-		Wave_Values wv;
-		wv.sin_value = 0;
-		wv.saw_value = 0;
-		wv.pwm_value = 0;
-		return wv;
+		amplitude = get_Amplitude(cv.wave_stat, 80);
+		if (80 <= cv.wave_stat)
+			pulse_mode = P_1;
+		else if (65 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 65 * M_2PI))
+		{
+			if (cv.free_run)
+				amplitude = get_Amplitude(cv.wave_stat, 50);
+			if (amplitude > 0.97)
+				amplitude = 0.97;
+			pulse_mode = P_3;
+		}
+		else if (50 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 50 * M_2PI))
+			pulse_mode = P_5;
+		else if (30 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 30 * M_2PI))
+			pulse_mode = P_9;
+		else if (14 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 14 * M_2PI))
+			pulse_mode = P_15;
+		else if (8 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 8 * M_2PI))
+			pulse_mode = P_27;
+		else
+		{
+			Wave_Values wv;
+			wv.sin_value = 0;
+			wv.saw_value = 0;
+			wv.pwm_value = 0;
+			return wv;
+		}
 	}
+
 	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
@@ -825,13 +852,13 @@ Wave_Values calculate_207_1000_update(Control_Values cv)
 			amplitude = 0.9 + 0.1 / 2.0 * (cv.wave_stat - 59);
 			pulse_mode = P_Wide_3;
 		}
-		else if (55 <= cv.wave_stat)
+		else if (55 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 55 * M_2PI))
 			pulse_mode = P_3;
-		else if (47 <= cv.wave_stat)
+		else if (47 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 47 * M_2PI))
 			pulse_mode = P_5;
-		else if (36 <= cv.wave_stat)
+		else if (36 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 36 * M_2PI))
 			pulse_mode = P_9;
-		else if (23 <= cv.wave_stat)
+		else if (23 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 23 * M_2PI))
 			pulse_mode = P_15;
 		else
 		{
@@ -850,13 +877,13 @@ Wave_Values calculate_207_1000_update(Control_Values cv)
 			amplitude = 0.8 + 0.2 / 8.0 * (cv.wave_stat - 72);
 			pulse_mode = P_Wide_3;
 		}
-		else if (57 <= cv.wave_stat)
+		else if (57 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 57 * M_2PI))
 			pulse_mode = P_3;
-		else if (44 <= cv.wave_stat)
+		else if (44 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 44 * M_2PI))
 			pulse_mode = P_5;
-		else if (29 <= cv.wave_stat)
+		else if (29 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 29 * M_2PI))
 			pulse_mode = P_9;
-		else if (14 <= cv.wave_stat)
+		else if (14 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 14 * M_2PI))
 			pulse_mode = P_15;
 		else
 		{
@@ -982,11 +1009,11 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 			amplitude = 0.8;
 		}
 
-		else if (60 <= cv.wave_stat)
+		else if (60 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 60 * M_2PI))
 			pulse_Mode = P_3;
-		else if (43 <= cv.wave_stat)
+		else if (43 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 43 * M_2PI))
 			pulse_Mode = P_5;
-		else if (25 <= cv.wave_stat)
+		else if (25 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 25 * M_2PI))
 			pulse_Mode = P_9;
 		else if (6 <= cv.wave_stat && cv.wave_stat <= 9)
 		{
@@ -1022,11 +1049,11 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 			amplitude = 0.8 + 0.2 / 5.0 * (cv.wave_stat - 56);
 		}
 
-		else if (51 <= cv.wave_stat)
+		else if (51 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 51 * M_2PI))
 			pulse_Mode = P_3;
-		else if (43 <= cv.wave_stat)
+		else if (43 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 43 * M_2PI))
 			pulse_Mode = P_5;
-		else if (27 <= cv.wave_stat)
+		else if (27 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 27 * M_2PI))
 			pulse_Mode = P_9;
 		else if (6 <= cv.wave_stat && cv.wave_stat <= 9)
 		{

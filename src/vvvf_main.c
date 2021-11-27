@@ -236,7 +236,7 @@ void set_phase(char phase, int stat)
 	}
 }
 
-char total_modes = 22;
+char total_modes = 23;
 Wave_Values get_Value_mode(int mode, Control_Values cv)
 {
 	if (mode == 0)
@@ -282,15 +282,17 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 		return calculate_tokyuu_5000(cv);
 	else if (mode == 20)
 		return calculate_tokyuu_1000_1500_IGBT(cv);
+	else if (mode == 21)
+		return calculate_E233_3000(cv);
 
 	/*
 	else if(mode == 21)
 		return calculate_jre_209_mitsubishi_gto(cv);
 	*/
 
-	else if (mode == 21)
-		return calculate_Famima(cv);
 	else if (mode == 22)
+		return calculate_Famima(cv);
+	else if (mode == 23)
 		return calculate_real_doremi(cv);
 
 	else
