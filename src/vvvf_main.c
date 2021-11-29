@@ -312,6 +312,7 @@ int pin_run(int mode)
 	double wave_stat = 0;
 	bool brake = false;
 	bool mascon_off = false;
+	bool free_run = false;
 
 	unsigned long long start_system_time = 0, end_targer_system_time = 0;
 
@@ -334,7 +335,7 @@ int pin_run(int mode)
 			if (!update_pin)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
-			Control_Values cv = {brake,!mascon_off, sin_angle_freq * M_1_2PI != wave_stat ,initial_phase,wave_stat};
+			Control_Values cv = {brake,!mascon_off, free_run ,initial_phase,wave_stat};
 			Wave_Values wv = get_Value_mode(mode, cv);
 			int require_stat = wv.pwm_value;
 			if (i == 0)
@@ -420,12 +421,21 @@ int pin_run(int mode)
 #ifdef ENABLE_MASCON_OFF
 		if (!mascon_off)
         {
-            wave_stat += 1 / (double)mascon_off_div;
-            if (sin_angle_freq * M_1_2PI < wave_stat)
+            if(free_run){
+				wave_stat += 1 / (double)mascon_off_div;
+           		if (sin_angle_freq * M_1_2PI < wave_stat){
+					free_run = false;
+					wave_stat = sin_angle_freq * M_1_2PI;
+				}
+				else
+					free_run = true;
+			}else{
 				wave_stat = sin_angle_freq * M_1_2PI;
-        }
-        else if(wave_stat > 0)
+			}
+				
+        else
         {
+			free_run = true;
             wave_stat -= 1 / (double)mascon_off_div;
             if (wave_stat < 0) wave_stat = 0;
         }

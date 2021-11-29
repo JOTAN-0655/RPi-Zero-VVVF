@@ -5,8 +5,8 @@
 #define M_1_PI 0.3183098861837
 #define M_1_2PI 0.1591549430918
 
-double mod_d(double a, double b);
-int mod_i(int a,int b);
+double mod_d(double a, double b,double b_reciprocal);
+int mod_i(int a,int b,double b_reciprocal);
 
 double sin(double radian);
 int my_random();
