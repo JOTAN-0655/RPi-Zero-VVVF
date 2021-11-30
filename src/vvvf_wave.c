@@ -2,9 +2,6 @@
 #include "vvvf_main.h"
 #include "my_math.h"
 
-#define random_range_com_val 30
-#define random_range_com_val_reciprocal 0.3333
-
 //function caliculation
 double get_saw_value_simple(double x)
 {
@@ -132,13 +129,13 @@ void reset_all_variables()
 }
 
 // random range => -range ~ range
-int get_random_freq(int base_freq, int range, double range_reciprocal)
+int get_random_freq(int base_freq, int range)
 {
 	int random_freq = 0;
 	if (random_freq_move_count == 0 || pre_saw_random_freq == 0)
 	{
 		int random_v = my_random();
-		int diff_freq = mod_i(random_v, range, range_reciprocal);
+		int diff_freq = mod_i(random_v, range);
 		if (random_v & 0x01)
 			diff_freq = -diff_freq;
 		int silent_random_freq = base_freq + diff_freq;
@@ -428,8 +425,8 @@ Wave_Values calculate_E235(Control_Values cv)
 		{
 			//saw_freq = 740;
 			int random_v = my_random();
-			int diff_freq = mod_i(random_v, 30 , 1 / 30.0);
-			if (mod_i(random_v, 500 , 1 / 500.0) < 250)
+			int diff_freq = mod_i(random_v, 30);
+			if (random_v & 0x01)
 				diff_freq = -diff_freq;
 
 			double base_freq = (double)550 + 3.148148148148148 * (cv.wave_stat); //170.0/54.0*(cv.wave_stat);
@@ -570,7 +567,7 @@ Wave_Values calculate_E233(Control_Values cv)
 	else
 	{
 		pulse_Mode = Not_In_Sync;
-		expect_saw_angle_freq = get_random_freq(750, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq(750, 100) * M_2PI;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
@@ -586,7 +583,7 @@ Wave_Values calculate_silent(Control_Values cv)
 	else
 	{
 		pulse_Mode = Not_In_Sync;
-		expect_saw_angle_freq = get_random_freq(550, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq(550, 100) * M_2PI;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
@@ -833,7 +830,7 @@ Wave_Values calculate_toubu_50050(Control_Values cv)
 	{
 		pulse_Mode = Not_In_Sync;
 		double base_freq = (double)730 - 50.0 / 49.0 * (cv.wave_stat); //170.0/54.0*(cv.wave_stat);
-		expect_saw_angle_freq = get_random_freq((int)base_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq((int)base_freq, 100) * M_2PI;
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
@@ -867,7 +864,7 @@ Wave_Values calculate_207_1000_update(Control_Values cv)
 		{
 			pulse_mode = Not_In_Sync;
 			double base_freq = 550 + 3.272727272727273 * cv.wave_stat;
-			expect_saw_angle_freq = get_random_freq((int)base_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 100 ) * M_2PI;
 		}
 	}
 	else
@@ -892,7 +889,7 @@ Wave_Values calculate_207_1000_update(Control_Values cv)
 		{
 			pulse_mode = Not_In_Sync;
 			double base_freq = 550 + 3.272727272727273 * cv.wave_stat;
-			expect_saw_angle_freq = get_random_freq((int)base_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 100) * M_2PI;
 		}
 	}
 
@@ -919,7 +916,7 @@ Wave_Values calculate_225_5100_mitsubishi(Control_Values cv)
 		{
 			amplitude = get_Amplitude(cv.wave_stat, 48);
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = get_random_freq(1050, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq(1050, 100) * M_2PI;
 		}
 	}
 	else
@@ -935,7 +932,7 @@ Wave_Values calculate_225_5100_mitsubishi(Control_Values cv)
 		{
 			amplitude = get_Amplitude(cv.wave_stat, 74);
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = get_random_freq(1050, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq(1050, 100) * M_2PI;
 		}
 	}
 
@@ -965,7 +962,7 @@ Wave_Values calculate_321_hitachi(Control_Values cv)
 			double base_freq = 1050;
 			if (4 >= cv.wave_stat)
 				base_freq = 510 + ((cv.wave_stat > 1) ? ((623 - 510) / 3.0 * (cv.wave_stat - 1)) : 0);
-			expect_saw_angle_freq = get_random_freq((int)base_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 100) * M_2PI;
 		}
 	}
 	else
@@ -981,7 +978,7 @@ Wave_Values calculate_321_hitachi(Control_Values cv)
 		{
 			amplitude = get_Amplitude(cv.wave_stat, 55);
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = get_random_freq((int)1050, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)1050, 100) * M_2PI;
 		}
 	}
 
@@ -1037,7 +1034,7 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 			int base_freq = 260;
 			if (cv.wave_stat > 3)
 				base_freq = (int)(260 + (365 - 260) / 25.0 * (cv.wave_stat - 3));
-			expect_saw_angle_freq = get_random_freq(base_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq(base_freq, 100) * M_2PI;
 		}
 	}
 	else
@@ -1070,7 +1067,7 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 			int base_freq = 260;
 			if (cv.wave_stat > 3)
 				base_freq = (int)(260 + (365 - 260) / 23.0 * (cv.wave_stat - 3));
-			expect_saw_angle_freq = get_random_freq(base_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+			expect_saw_angle_freq = get_random_freq(base_freq, 100) * M_2PI;
 		}
 	}
 
@@ -1169,24 +1166,24 @@ Wave_Values calculate_toei_6300_3(Control_Values cv)
 		pulse_Mode = P_3;
 	else if (15 <= cv.wave_stat)
 	{
-		expect_saw_angle_freq = get_random_freq(1000, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq(1000, 100) * M_2PI;
 		pulse_Mode = Not_In_Sync;
 	}
 	else if (5 <= cv.wave_stat)
 	{
 		double expect_saw_freq = 220 + (1000 - 220) / 10 * (cv.wave_stat - 5);
-		expect_saw_angle_freq = get_random_freq((int)expect_saw_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq((int)expect_saw_freq, 100) * M_2PI;
 		pulse_Mode = Not_In_Sync;
 	}
 	else if (cv.wave_stat <= 3 && cv.brake)
 	{
 		double expect_saw_freq = 205 + (220 - 205) / 3.0 * (cv.wave_stat);
-		expect_saw_angle_freq = get_random_freq((int)expect_saw_freq, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq((int)expect_saw_freq, 100) * M_2PI;
 		pulse_Mode = Not_In_Sync;
 	}
 	else
 	{
-		expect_saw_angle_freq = get_random_freq(220, random_range_com_val , random_range_com_val_reciprocal) * M_2PI;
+		expect_saw_angle_freq = get_random_freq(220, 100) * M_2PI;
 		pulse_Mode = Not_In_Sync;
 	}
 
@@ -1472,12 +1469,11 @@ Wave_Values calculate_E233_3000(Control_Values cv)
 			if (cv.wave_stat <= 9)
 			{
 				double random_range = 99/5.0 * (cv.wave_stat - 4) + 1 ;
-				double random_range_reciprocal = 5.0 / (99 * cv.wave_stat - 391);
-				expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, (int)random_range,random_range_reciprocal);
+				expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, (int)random_range);
 			}
 			else
 			{
-				expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, 100 , 0.01);
+				expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, 100);
 			}
 		}
 	}
@@ -1502,12 +1498,12 @@ Wave_Values calculate_E233_3000(Control_Values cv)
 			double base_freq = 525 + (910 - 510) / (41.6 - 19.7) * (cv.wave_stat - 19.7);
 			if (base_freq > 910)
 				base_freq = 910;
-			expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, random_range_com_val , random_range_com_val_reciprocal);
+			expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, 100);
 		}
 		else
 		{
 			pulse_Mode = Not_In_Sync;
-			expect_saw_angle_freq = M_2PI * get_random_freq(525, random_range_com_val , random_range_com_val_reciprocal);
+			expect_saw_angle_freq = M_2PI * get_random_freq(525, 100);
 		}
 	}
 

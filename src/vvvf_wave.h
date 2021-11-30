@@ -59,7 +59,7 @@ extern int random_freq_move_count;
 extern int pre_saw_random_freq;
 
 void reset_all_variables();
-int get_random_freq(int base_freq, int range, double range_reciprocal);
+int get_random_freq(int base_freq, int range);
 double get_pattern_random(int lowest, int highest,int interval_count);
 
 Wave_Values calculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
