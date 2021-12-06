@@ -1,5 +1,0 @@
-C7 C8 C9 are snubber capacitors
-So, I recommend to you using high voltage rated film capacitor.
-
-R19 R20 R21 are snubber resistors.
-It may well come hot.So, you need to cooldown resistors and use high watt rated resistor.
