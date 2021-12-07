@@ -558,16 +558,37 @@ Wave_Values calculate_9820_hitachi(Control_Values cv)
 Wave_Values calculate_E233(Control_Values cv)
 {
 	double amplitude = get_Amplitude(cv.wave_stat, 50);
+	if (cv.free_run && cv.mascon_on == false && amplitude < 0.85)
+	{
+		amplitude = 0.0;
+	}
+
 	double expect_saw_angle_freq = 1;
 	Pulse_Mode pulse_Mode = P_1;
-	if (50 <= cv.wave_stat)
-		pulse_Mode = P_1;
-	else if (45 <= cv.wave_stat)
-		pulse_Mode = P_3;
+	if (cv.brake)
+	{
+		amplitude = get_Amplitude(cv.wave_stat, 73.5);
+		if (73.5 <= cv.wave_stat)
+			pulse_Mode = P_1;
+		else if (62.5 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 62.5 * M_2PI))
+			pulse_Mode = P_3;
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			expect_saw_angle_freq = get_random_freq(750, 100) * M_2PI;
+		}
+	}
 	else
 	{
-		pulse_Mode = Not_In_Sync;
-		expect_saw_angle_freq = get_random_freq(750, 100) * M_2PI;
+		if (50 <= cv.wave_stat)
+			pulse_Mode = P_1;
+		else if (45 <= cv.wave_stat || (cv.free_run && sin_angle_freq > 45 * M_2PI))
+			pulse_Mode = P_3;
+		else
+		{
+			pulse_Mode = Not_In_Sync;
+			expect_saw_angle_freq = get_random_freq(750, 100) * M_2PI;
+		}
 	}
 
 	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
@@ -864,7 +885,7 @@ Wave_Values calculate_207_1000_update(Control_Values cv)
 		{
 			pulse_mode = Not_In_Sync;
 			double base_freq = 550 + 3.272727272727273 * cv.wave_stat;
-			expect_saw_angle_freq = get_random_freq((int)base_freq, 100 ) * M_2PI;
+			expect_saw_angle_freq = get_random_freq((int)base_freq, 100) * M_2PI;
 		}
 	}
 	else
@@ -1468,7 +1489,7 @@ Wave_Values calculate_E233_3000(Control_Values cv)
 			pulse_Mode = Not_In_Sync;
 			if (cv.wave_stat <= 9)
 			{
-				double random_range = 99/5.0 * (cv.wave_stat - 4) + 1 ;
+				double random_range = 99 / 5.0 * (cv.wave_stat - 4) + 1;
 				expect_saw_angle_freq = M_2PI * get_random_freq((int)base_freq, (int)random_range);
 			}
 			else

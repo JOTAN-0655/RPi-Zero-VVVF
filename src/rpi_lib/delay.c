@@ -24,25 +24,21 @@ volatile unsigned long long get_systime(void) {
     chi = *(volatile unsigned int *) SYST_CHI;
     clo = *(volatile unsigned int *) SYST_CLO;
   }
-  t = (unsigned long long)chi;
+  t = chi;
   t = t << 32;
-  t += (unsigned long long)clo;
+  t += clo;
   return t;
 }
 
 void delay_ms(unsigned int delay){
-  unsigned long long alermTime;
-
-  alermTime = get_systime() + delay * 1000;
+  unsigned long long alermTime = get_systime() + delay * 1000;
   while(get_systime() < alermTime);
   
   return;
 }
 
 void delay_us(unsigned int delay){
-  unsigned long long alermTime;
-
-  alermTime = get_systime() + delay;
+  unsigned long long alermTime = get_systime() + delay;
   while(get_systime() < alermTime);
   
   return;

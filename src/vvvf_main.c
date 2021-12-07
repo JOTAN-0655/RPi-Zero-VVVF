@@ -187,8 +187,9 @@ char get_pin_L_1(char phase)
 
 /*
 	stat = 0 => PIN_H_1/2 = 0 , PIN_L_1/2 = 1
-	stat = 1 => PIN_H/L_2 = 0 , PIN_H/L_2 = 1
+	stat = 1 => PIN_H/L_2 = 0 , PIN_H/L_1 = 1
 	stat = 2 => PIN_H_1/2 = 1 , PIN_L_1/2 = 0
+	no above => PIN_H_1/2 = 0 , PIN_L_1/2 = 0
 */
 void set_phase(char phase, int stat)
 {
@@ -347,11 +348,11 @@ int pin_run(int mode)
 		}
 
 		if (get_phase_stat(0) != stat_U)
-			set_phase(0, 0);
+			set_phase(0, 3);
 		if (get_phase_stat(1) != stat_V)
-			set_phase(1, 0);
+			set_phase(1, 3);
 		if (get_phase_stat(2) != stat_W)
-			set_phase(2, 0);
+			set_phase(2, 3);
 		delay_us(1);
 		set_phase(0, stat_U);
 		set_phase(1, stat_V);
@@ -405,7 +406,7 @@ int pin_run(int mode)
 				disconnect = true;
 				all_off();
 			}
-			else if (sin_angle_freq * M_1_2PI == wave_stat)
+			else if (!free_run)
 			{
 				disconnect = false;
 				sin_time *= sin_angle_freq;
