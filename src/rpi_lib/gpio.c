@@ -154,8 +154,28 @@ void digitalWrite(unsigned int pin, unsigned int value)
 		}
 	}	
 	
-	*addr = ((long)1 << (int)((int)pin % (int)32)); 
+	*addr = (1 << (pin & 31)); 
 }
+
+/**
+ * @brief 
+ * This function can be used only with max pin num is not over than 31
+ * 
+ * @param pin 
+ * @param value 
+ */
+void digitalWrite_special(unsigned int pins, unsigned int value)
+{
+	volatile unsigned int* addr;
+	
+	if(value == HIGH)
+		addr = GPSET0;
+	else
+		addr = GPCLR0;
+	
+	*addr = pins;
+}
+
 
 int digitalRead(unsigned int pin)
 {
@@ -170,7 +190,7 @@ int digitalRead(unsigned int pin)
 		addr = GPLEV1;
 	}
 
-	mask = 1 << (pin % 32);
+	mask = 1 << (pin & 31);
 	if((*addr & mask) != 0){
 		return HIGH;
 	}

@@ -18,11 +18,20 @@ int get_Mascon_status();
 int get_phase_stat(char phase);
 void set_phase_stat(char phase,int stat);
 
+typedef struct {
+    char H_2;
+    char H_1;
+    char L_1;
+    char L_2;
+} Gpio_Set_Data;
+
 char get_pin_H_2(char phase);
 char get_pin_L_2(char phase);
 char get_pin_H_1(char phase);
 char get_pin_L_1(char phase);
-void set_phase(char phase,int stat);
+
+Gpio_Set_Data get_phase_set(int stat);
+void set_phase(int stat_U,int stat_V,int stat_W);
 
 Wave_Values get_Value_mode(int mode,Control_Values cv);
 int pin_run(int mode);

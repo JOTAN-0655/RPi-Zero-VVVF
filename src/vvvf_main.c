@@ -185,56 +185,78 @@ char get_pin_L_1(char phase)
 	else return PIN_W_LOW_1;
 }
 
-/*
-	stat = 0 => PIN_H_1/2 = 0 , PIN_L_1/2 = 1
-	stat = 1 => PIN_H/L_2 = 0 , PIN_H/L_1 = 1
-	stat = 2 => PIN_H_1/2 = 1 , PIN_L_1/2 = 0
-	no above => PIN_H_1/2 = 0 , PIN_L_1/2 = 0
-*/
-void set_phase(char phase, int stat)
+/**
+ * @brief Get the phase set object
+ * stat = 0 => PIN_H_1/2 = 0 , PIN_L_1/2 = 1
+ * stat = 1 => PIN_H/L_2 = 0 , PIN_H/L_1 = 1
+ * stat = 2 => PIN_H_1/2 = 1 , PIN_L_1/2 = 0
+ * no above => PIN_H_1/2 = 0 , PIN_L_1/2 = 0
+ * 
+ * @param stat 
+ * @return Gpio_Set_Data 
+ */
+Gpio_Set_Data get_phase_set(int stat)
 {
-	if (ignore_pin_change == 1)
-		return;
-	if (get_phase_stat(phase) == stat)
-		return;
-
-	char pin_H_2 = get_pin_H_2(phase);
-	char pin_L_2 = get_pin_L_2(phase);
-	char pin_H_1 = get_pin_H_1(phase);
-	char pin_L_1 = get_pin_L_1(phase);
-
-	set_phase_stat(phase, stat);
+	char H_1,H_2,L_1,L_2;
 	if (stat == 0)
 	{
-		digitalWrite(pin_H_2, LOW);
-		digitalWrite(pin_H_1, LOW);
-
-		digitalWrite(pin_L_1, HIGH);
-		digitalWrite(pin_L_2, HIGH);
+		H_2 = LOW;
+		H_1 = LOW;
+		L_1 = HIGH;
+		L_2 = HIGH;
 	}
 	else if(stat == 1){
-		digitalWrite(pin_H_2, LOW);
-		digitalWrite(pin_H_1, HIGH);
-
-		digitalWrite(pin_L_1, HIGH);
-		digitalWrite(pin_L_2, LOW);
+		H_2 = LOW;
+		H_1 = HIGH;
+		L_1 = HIGH;
+		L_2 = LOW;
 	}
 	else if (stat == 2)
 	{
-		digitalWrite(pin_H_2, HIGH);
-		digitalWrite(pin_H_1, HIGH);
-
-		digitalWrite(pin_L_1, LOW);
-		digitalWrite(pin_L_2, LOW);
+		H_2 = HIGH;
+		H_1 = HIGH;
+		L_1 = LOW;
+		L_2 = LOW;
 	}
 	else
 	{
-		digitalWrite(pin_H_2, LOW);
-		digitalWrite(pin_H_1, LOW);
-
-		digitalWrite(pin_L_1, LOW);
-		digitalWrite(pin_L_2, LOW);
+		H_2 = LOW;
+		H_1 = LOW;
+		L_1 = LOW;
+		L_2 = LOW;
 	}
+	Gpio_Set_Data set_data = { H_2,H_1,L_1,L_2 };
+	return set_data;
+}
+
+void set_phase(int stat_U,int stat_V,int stat_W)
+{
+	if (ignore_pin_change == 1)
+		return;
+
+	unsigned int set_to_high = 0, set_to_low = 0;
+
+	for(int phase = 0; phase < 3;phase++){
+		int p_s = stat_U;
+		if(phase == 1) p_s = stat_V;
+		else if(phase == 2) p_s = stat_W;
+
+		Gpio_Set_Data gpio = get_phase_set(p_s);
+		if(gpio.H_2) set_to_high |= 1 << get_pin_H_2(phase);
+		else set_to_low |= 1 << get_pin_H_2(phase);
+
+		if(gpio.H_1) set_to_high |= 1 << get_pin_H_1(phase);
+		else set_to_low |= 1 << get_pin_H_1(phase);
+
+		if(gpio.L_1) set_to_high |= 1 << get_pin_L_1(phase);
+		else set_to_low |= 1 << get_pin_L_1(phase);
+
+		if(gpio.L_2) set_to_high |= 1 << get_pin_L_2(phase);
+		else set_to_low |= 1 << get_pin_L_2(phase);
+	}
+
+	digitalWrite_special(set_to_high, HIGH);
+	digitalWrite_special(set_to_low, LOW);
 }
 
 char total_modes = 23;
@@ -347,17 +369,25 @@ int pin_run(int mode)
 				stat_W = require_stat;
 		}
 
-		if (get_phase_stat(0) != stat_U)
-			set_phase(0, 3);
-		if (get_phase_stat(1) != stat_V)
-			set_phase(1, 3);
-		if (get_phase_stat(2) != stat_W)
-			set_phase(2, 3);
-		delay_us(1);
-		set_phase(0, stat_U);
-		set_phase(1, stat_V);
-		set_phase(2, stat_W);
+		int dead_time_U = stat_U,dead_time_V = stat_V,dead_time_W = stat_W;
+		if (get_phase_stat(0) != stat_U){
+			dead_time_U = 3;
+			set_phase_stat(0,stat_U);
+		}
+		if (get_phase_stat(1) != stat_V){
+			dead_time_V = 3;
+			set_phase_stat(1,stat_V);
+		}
+		if (get_phase_stat(2) != stat_W){
+			dead_time_W = 3;
+			set_phase_stat(2,stat_W);
+		}
+		set_phase(dead_time_U,dead_time_V,dead_time_W);
 
+		delay_us(1);
+
+		set_phase(stat_U,stat_V,stat_W);
+		
 		count++;
 		if (count % 8 == 0 && do_frequency_change)
 		{

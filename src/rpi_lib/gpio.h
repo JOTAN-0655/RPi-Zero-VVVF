@@ -28,6 +28,7 @@ extern void InitializeGpio();
 extern void setPullUpDown(unsigned int pin, unsigned int mode);
 extern void pinMode(unsigned int pin, unsigned int type);
 extern void digitalWrite(unsigned int pin, unsigned int value);
+extern void digitalWrite_special(unsigned int pins, unsigned int value);
 extern int digitalRead(unsigned int pin);
 
 void setFallDetect(unsigned int pin,bool set,bool async);
