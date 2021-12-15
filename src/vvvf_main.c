@@ -77,20 +77,7 @@ void debug_pin_low()
 
 void all_off()
 {
-	digitalWrite(PIN_U_HIGH_2, LOW);
-	digitalWrite(PIN_U_HIGH_1, LOW);
-	digitalWrite(PIN_U_LOW_1, LOW);
-	digitalWrite(PIN_U_LOW_2, LOW);
-	
-	digitalWrite(PIN_V_HIGH_2, LOW);
-	digitalWrite(PIN_V_HIGH_1, LOW);
-	digitalWrite(PIN_V_LOW_1, LOW);
-	digitalWrite(PIN_V_LOW_2, LOW);
-
-	digitalWrite(PIN_W_HIGH_2, LOW);
-	digitalWrite(PIN_W_HIGH_1, LOW);
-	digitalWrite(PIN_W_LOW_1, LOW);
-	digitalWrite(PIN_W_LOW_2, LOW);
+	set_phase(3,3,3);
 }
 
 void initialize_vvvf_pin()
@@ -322,8 +309,7 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 		return calculate_silent(cv);
 }
 
-char count = 0;
-char do_frequency_change = 1, update_pin = 1;
+char update_pin = 1;
 unsigned int button_press_count = 0;
 
 int mascon_off_div = 1000;
@@ -382,68 +368,67 @@ int pin_run(int mode)
 			dead_time_W = 3;
 			set_phase_stat(2,stat_W);
 		}
+
 		set_phase(dead_time_U,dead_time_V,dead_time_W);
 
-		delay_us(1);
-
-		set_phase(stat_U,stat_V,stat_W);
-		
-		count++;
-		if (count % 8 == 0 && do_frequency_change)
+		//sine angle freq change etc..
+		double sin_new_angle_freq = sin_angle_freq;
+		char mascon_status = (char)get_Mascon_status();
+		if (mascon_status - 4 > 0)
 		{
-			count = 0;
-			double sin_new_angle_freq = sin_angle_freq;
-			char mascon_status = (char)get_Mascon_status();
-			if (mascon_status - 4 > 0)
-			{
-				sin_new_angle_freq += 0.0020943951023932 * (mascon_status - 4);
-				brake = false;
-				mascon_off = false;
-			}
-			else if (mascon_status - 4 < 0)
-			{
-				sin_new_angle_freq -= 0.0020943951023932 * (4 - mascon_status);
-				brake = true;
-				mascon_off = false;
-			}
+			sin_new_angle_freq += 0.00026179938779915 * (mascon_status - 4);
+			brake = false;
+			mascon_off = false;
+		}
+		else if (mascon_status - 4 < 0)
+		{
+			sin_new_angle_freq -= 0.00026179938779915 * (4 - mascon_status);
+			brake = true;
+			mascon_off = false;
+		}
 #ifdef ENABLE_MASCON_OFF
+		else
+		{
+			if (sin_new_angle_freq > 0)
+				mascon_off = true;
 			else
-			{
-				if (sin_new_angle_freq > 0)
-					mascon_off = true;
-				else
-					mascon_off = false;
-			}
+				mascon_off = false;
+		}
 #endif
 
-			if (sin_new_angle_freq > 942.4777960769379)
-				sin_new_angle_freq = 942.4777960769379;
-
-			if (wave_stat <= 0)
-			{
-				all_off();
-				disconnect = true;
-			}
-			else
-				disconnect = false;
-
-			if (sin_new_angle_freq <= 0)
-			{
-				sin_time = 0;
-				saw_time = 0;
-				sin_angle_freq = 0;
-				wave_stat = 0;
-				disconnect = true;
-				all_off();
-			}
-			else if (!free_run)
-			{
-				disconnect = false;
-				sin_time *= sin_angle_freq;
-				sin_time /= sin_new_angle_freq;
-				sin_angle_freq = sin_new_angle_freq;
-			}
+		if (sin_new_angle_freq > 942.4777960769379)
+			sin_new_angle_freq = 942.4777960769379;
+		if (wave_stat <= 0)
+		{
+			all_off();
+			disconnect = true;
+			ignore_pin_change = true;
 		}
+		else{
+			disconnect = false;
+			ignore_pin_change = false;
+		}
+			
+		if (sin_new_angle_freq <= 0)
+		{
+			sin_time = 0;
+			saw_time = 0;
+			sin_angle_freq = 0;
+			wave_stat = 0;
+			all_off();
+			disconnect = true;
+			ignore_pin_change = true;
+			
+		}
+		else if (!free_run)
+		{
+			disconnect = false;
+			ignore_pin_change = false;
+			sin_time *= sin_angle_freq;
+			sin_time /= sin_new_angle_freq;
+			sin_angle_freq = sin_new_angle_freq;
+		}
+
 
 #ifndef ENABLE_MASCON_OFF
 		wave_stat = sin_angle_freq * M_1_2PI;
@@ -508,6 +493,9 @@ int pin_run(int mode)
 		{
 			button_press_count = 0;
 		}
+		
+		set_phase(stat_U,stat_V,stat_W);
+		
 		while (end_targer_system_time > get_systime());
 		debug_pin_toggle();
 	}
