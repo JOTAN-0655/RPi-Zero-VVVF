@@ -70,6 +70,10 @@ This number is BCM GPIO number.
 - PIN_W_LOW_1 9
 - PIN_W_LOW_2 19
 
+- debug_PIN_2 24
+- debug_PIN 25
+- LED_PIN 47
+
 # Function pin out
 This number is BCM GPIO number
 
