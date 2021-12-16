@@ -67,12 +67,13 @@ void debug_pin_toggle()
 }
 void debug_pin_high()
 {
-	digitalWrite(debug_PIN, HIGH);
+
+	digitalWrite_special(33554432,HIGH); // 1 << debug_PIN
 	debug_pin_stat = 1;
 }
 void debug_pin_low()
 {
-	digitalWrite(debug_PIN, LOW);
+	digitalWrite_special(33554432,LOW); // 1 << debug_PIN
 	debug_pin_stat = 0;
 }
 
@@ -86,12 +87,12 @@ void debug_pin_2_toggle()
 }
 void debug_pin_2_high()
 {
-	digitalWrite(debug_PIN_2, HIGH);
+	digitalWrite_special(16777216,HIGH); // 1 << debug_PIN_2
 	debug_pin_2_stat = 1;
 }
 void debug_pin_2_low()
 {
-	digitalWrite(debug_PIN_2, LOW);
+	digitalWrite_special(16777216,LOW); // 1 << debug_PIN_2
 	debug_pin_2_stat = 0;
 }
 
@@ -321,7 +322,7 @@ Wave_Values get_Value_mode(int mode, Control_Values cv)
 		return calculate_jre_209_mitsubishi_gto(cv);
 	*/
 
-	else if (mode == 22)
+	else if (mode == 22) //large time
 		return calculate_Famima(cv);
 	else if (mode == 23)
 		return calculate_real_doremi(cv);
@@ -334,12 +335,13 @@ char update_pin = 1;
 unsigned int button_press_count = 0;
 
 int mascon_off_div = 1000;
+double pin_run_wave_stat = 0;
 
 int pin_run(int mode)
 {
 	int return_val = 0;
 
-	double wave_stat = 0;
+	
 	bool brake = false;
 	bool mascon_off = false;
 	bool free_run = false;
@@ -361,15 +363,14 @@ int pin_run(int mode)
 		sin_time += 0.000017;
 		saw_time += 0.000017;
 
-		debug_pin_2_high();
-
 		int stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)
 		{
+			debug_pin_2_toggle();
 			if (!update_pin)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
-			Control_Values cv = {brake,!mascon_off, free_run ,initial_phase,wave_stat};
+			Control_Values cv = {brake,!mascon_off, free_run ,initial_phase,pin_run_wave_stat};
 			Wave_Values wv = get_Value_mode(mode, cv);
 			int require_stat = wv.pwm_value;
 			if (i == 0)
@@ -378,7 +379,10 @@ int pin_run(int mode)
 				stat_V = require_stat;
 			else
 				stat_W = require_stat;
+			
 		}
+
+		debug_pin_2_low();
 
 		int dead_time_U = stat_U,dead_time_V = stat_V,dead_time_W = stat_W;
 		if (get_phase_stat(0) != stat_U){
@@ -394,7 +398,10 @@ int pin_run(int mode)
 			set_phase_stat(2,stat_W);
 		}
 
+		debug_pin_2_high();
+
 		set_phase(dead_time_U,dead_time_V,dead_time_W);
+		
 
 		//sine angle freq change etc..
 		double sin_new_angle_freq = sin_angle_freq;
@@ -423,7 +430,7 @@ int pin_run(int mode)
 
 		if (sin_new_angle_freq > 942.4777960769379)
 			sin_new_angle_freq = 942.4777960769379;
-		if (wave_stat <= 0)
+		if (pin_run_wave_stat <= 0)
 		{
 			all_off();
 			disconnect = true;
@@ -439,7 +446,7 @@ int pin_run(int mode)
 			sin_time = 0;
 			saw_time = 0;
 			sin_angle_freq = 0;
-			wave_stat = 0;
+			pin_run_wave_stat = 0;
 			all_off();
 			disconnect = true;
 			ignore_pin_change = true;
@@ -456,29 +463,29 @@ int pin_run(int mode)
 
 
 #ifndef ENABLE_MASCON_OFF
-		wave_stat = sin_angle_freq * M_1_2PI;
+		pin_run_wave_stat = sin_angle_freq * M_1_2PI;
 #endif
 
 #ifdef ENABLE_MASCON_OFF
 		if (!mascon_off)
         {
             if(free_run){
-				wave_stat += 1 / (double)mascon_off_div;
-           		if (sin_angle_freq * M_1_2PI < wave_stat){
+				pin_run_wave_stat += 1 / (double)mascon_off_div;
+           		if (sin_angle_freq * M_1_2PI < pin_run_wave_stat){
 					free_run = false;
-					wave_stat = sin_angle_freq * M_1_2PI;
+					pin_run_wave_stat = sin_angle_freq * M_1_2PI;
 				}
 				else
 					free_run = true;
 			}else{
-				wave_stat = sin_angle_freq * M_1_2PI;
+				pin_run_wave_stat = sin_angle_freq * M_1_2PI;
 			}
-				
+		}
         else
         {
 			free_run = true;
-            wave_stat -= 1 / (double)mascon_off_div;
-            if (wave_stat < 0) wave_stat = 0;
+            pin_run_wave_stat -= 1 / (double)mascon_off_div;
+            if (pin_run_wave_stat < 0) pin_run_wave_stat = 0;
         }
 #endif
 

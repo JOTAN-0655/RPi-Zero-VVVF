@@ -26,7 +26,7 @@ volatile unsigned long long get_systime(void) {
   }
   t = chi;
   t = t << 32;
-  t += clo;
+  t |= clo;
   return t;
 }
 

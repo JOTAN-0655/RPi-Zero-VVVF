@@ -194,22 +194,25 @@ Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle
 Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude)
 {
 
-	if (pulse_mode == P_Wide_3)
-		return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, false);
-	if (pulse_mode == SP_Wide_3)
-		return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, true);
-	if (pulse_mode == P_5)
-		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
-	if (pulse_mode == SP_5)
-		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
-	if (pulse_mode == P_7)
-		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
-	if (pulse_mode == SP_7)
-		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
-	if (pulse_mode == P_11)
-		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
-	if (pulse_mode == SP_11)
-		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+	switch((int)pulse_mode){
+		case P_Wide_3:
+			return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, false);
+		case SP_Wide_3:
+			return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, true);
+		case P_5:
+			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+		case SP_5:
+			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+		case P_7:
+			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+		case SP_7:
+			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+		case P_11:
+			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+		case SP_11:
+			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+	}
+	
 
 	if (pulse_mode == Not_In_Sync)
 		saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
@@ -237,9 +240,23 @@ Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq
 
 Wave_Values calculate_E231(Control_Values cv)
 {
+	mascon_off_div = 680;
 	double amplitude = get_Amplitude(cv.wave_stat, 65);
 	double expect_saw_angle_freq = 0;
 	Pulse_Mode pulse_mode;
+	if (cv.free_run && !cv.mascon_on && cv.wave_stat > 67)
+    {
+		cv.wave_stat = 67;
+		pin_run_wave_stat = 67;
+	}
+	else if(cv.free_run && cv.mascon_on && cv.wave_stat > 67)
+    {
+		pin_run_wave_stat = sin_angle_freq * M_1_2PI;
+		cv.wave_stat = pin_run_wave_stat;
+		
+	}
+
+
 	if (cv.wave_stat > 67)
 		pulse_mode = P_1;
 	else if (cv.wave_stat > 60)
