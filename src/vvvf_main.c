@@ -33,6 +33,7 @@
 #define button_SEL 7
 #define button_L 8
 
+#define debug_PIN_2 24
 #define debug_PIN 25
 #define LED_PIN 47
 
@@ -75,6 +76,25 @@ void debug_pin_low()
 	debug_pin_stat = 0;
 }
 
+char debug_pin_2_stat = 0;
+void debug_pin_2_toggle()
+{
+	if (debug_pin_2_stat == 0)
+		debug_pin_2_high();
+	else
+		debug_pin_2_low();
+}
+void debug_pin_2_high()
+{
+	digitalWrite(debug_PIN_2, HIGH);
+	debug_pin_2_stat = 1;
+}
+void debug_pin_2_low()
+{
+	digitalWrite(debug_PIN_2, LOW);
+	debug_pin_2_stat = 0;
+}
+
 void all_off()
 {
 	set_phase(3,3,3);
@@ -108,6 +128,7 @@ void initialize_vvvf_pin()
 
 	pinMode(LED_PIN, OUTPUT);
 	pinMode(debug_PIN, OUTPUT);
+	pinMode(debug_PIN_2, OUTPUT);
 
 	all_off();
 }
@@ -331,12 +352,16 @@ int pin_run(int mode)
 	clearEventDetect(button_L);
 	clearEventDetect(button_SEL);
 
+	debug_pin_2_low();
+
 	while (1)
 	{
 		start_system_time = get_systime();
 		end_targer_system_time = start_system_time + 17;
 		sin_time += 0.000017;
 		saw_time += 0.000017;
+
+		debug_pin_2_high();
 
 		int stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)
@@ -494,6 +519,8 @@ int pin_run(int mode)
 			button_press_count = 0;
 		}
 		
+		debug_pin_2_low();
+
 		set_phase(stat_U,stat_V,stat_W);
 		
 		while (end_targer_system_time > get_systime());
