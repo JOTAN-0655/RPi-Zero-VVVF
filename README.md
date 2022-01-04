@@ -57,21 +57,21 @@ arm_freq=1200
 This number is BCM GPIO number.
 - PIN_U_HIGH_2 12
 - PIN_U_HIGH_1 13
-- PIN_U_LOW_1 0
+- PIN_U_LOW_1 11
 - PIN_U_LOW_2 21
 
 - PIN_V_HIGH_2 16
 - PIN_V_HIGH_1 6
-- PIN_V_LOW_1 11
+- PIN_V_LOW_1 9
 - PIN_V_LOW_2 26
 
 - PIN_W_HIGH_2 20
 - PIN_W_HIGH_1 5
-- PIN_W_LOW_1 9
+- PIN_W_LOW_1 25
 - PIN_W_LOW_2 19
 
-- debug_PIN_2 24
-- debug_PIN 25
+- debug_PIN_2 23
+- debug_PIN 24
 - LED_PIN 47
 
 # Function pin out
@@ -94,9 +94,9 @@ If it is more than 4 (5,6,7,8), vvvf frequency will increase. 8 is most strong f
 
 ## Control button
 ### pin out
- - button_R 1
- - button_SEL 7
- - button_L 8
+ - button_R 7
+ - button_SEL 8
+ - button_L 18
 
 When button_SEL is pressed, it will stop vvvf system.And sets all of vvvf pin to low.
 When button_R/L is pressed, it will change vvvf sound.
