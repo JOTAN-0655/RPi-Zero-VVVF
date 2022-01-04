@@ -11,17 +11,17 @@
 //PIN DEFINE
 #define PIN_U_HIGH_2 12
 #define PIN_U_HIGH_1 13
-#define PIN_U_LOW_1 0
+#define PIN_U_LOW_1 11
 #define PIN_U_LOW_2 21
 
 #define PIN_V_HIGH_2 16
 #define PIN_V_HIGH_1 6
-#define PIN_V_LOW_1 11
+#define PIN_V_LOW_1 9
 #define PIN_V_LOW_2 26
 
 #define PIN_W_HIGH_2 20
 #define PIN_W_HIGH_1 5
-#define PIN_W_LOW_1 9
+#define PIN_W_LOW_1 25
 #define PIN_W_LOW_2 19
 
 #define mascon_1 4
@@ -29,12 +29,12 @@
 #define mascon_3 27
 #define mascon_4 22
 
-#define button_R 1
-#define button_SEL 7
-#define button_L 8
+#define button_R 7
+#define button_SEL 8
+#define button_L 18
 
-#define debug_PIN_2 24
-#define debug_PIN 25
+#define debug_PIN_2 23
+#define debug_PIN 24
 #define LED_PIN 47
 
 
@@ -68,12 +68,12 @@ void debug_pin_toggle()
 void debug_pin_high()
 {
 
-	digitalWrite_special(33554432,HIGH); // 1 << debug_PIN
+	digitalWrite_special(1 << debug_PIN,HIGH); // 1 << debug_PIN
 	debug_pin_stat = 1;
 }
 void debug_pin_low()
 {
-	digitalWrite_special(33554432,LOW); // 1 << debug_PIN
+	digitalWrite_special(1 << debug_PIN,LOW); // 1 << debug_PIN
 	debug_pin_stat = 0;
 }
 
@@ -87,12 +87,12 @@ void debug_pin_2_toggle()
 }
 void debug_pin_2_high()
 {
-	digitalWrite_special(16777216,HIGH); // 1 << debug_PIN_2
+	digitalWrite_special(1 << debug_PIN_2,HIGH); // 1 << debug_PIN_2
 	debug_pin_2_stat = 1;
 }
 void debug_pin_2_low()
 {
-	digitalWrite_special(16777216,LOW); // 1 << debug_PIN_2
+	digitalWrite_special(1 << debug_PIN_2,LOW); // 1 << debug_PIN_2
 	debug_pin_2_stat = 0;
 }
 
