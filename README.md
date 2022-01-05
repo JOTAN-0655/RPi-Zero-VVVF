@@ -1,7 +1,7 @@
 # raspi-zero-vvvf
-Making VVVF inverter with raspberry pi zero.
-This code is for baremetal on raspberry pi zero.
-This `main` repository is for 2 and 3 level vvvf.
+Making a VVVF inverter with a raspberry pi zero.
+This code is baremetal on a raspberry pi zero.
+The `main` repository is for 2 and 3 level vvvf.
 
 # terms of use
 ## disclaimer
@@ -10,8 +10,8 @@ MAY CAUSE YOU A BIG DAMAGE WITH ELECTRONIC.<br>
 THIS VVVF CODE IS NOT MADE BY ENGINEER OR ANY PROFESSIONAL.<br>
 
 ## credit
-Main author of this program is JOTAN-0655 except raspberry pi lib.<br>
-Please label this github url and references url if you upload on youtube or other websites.
+The main author of this program is JOTAN-0655 except for the raspberry pi lib.<br>
+Please reference this github url if you upload on youtube or other websites.
 
 # references
 https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
@@ -29,16 +29,16 @@ Normally, just run <br>
 
 
 # install to RPi zero
-Since you have finished your code build, you will find `kernel.img` inside of build folder.<br>
+When you have built the code, you will find `kernel.img` inside of build folder.<br>
 What you need to do is
 
-## Download the needed files
+## Download the necessary files
 From https://github.com/raspberrypi/firmware/tree/master/boot , you have to get <br>
  - bootcode.bin
  - start.elf
 
 ## SD card
-Now, you need to have some SD card which has more than 2GB.<br>
+Now, you need to have a SD card which has more than 2GB but less than 32GB.<br>
 Also the SD card needs to be formated with FAT32.<br>
 <br>
 
@@ -47,14 +47,14 @@ Now , it's time to install.<br>
 Copy `bootcode.bin` , `start.elf` and `kernel.img` that you have built.<br>
 
 ## Sequel
-If you want raspberry pi zero to work faster, make `config.txt` and just paste next code.<br>
+If you want the raspberry pi zero to run faster, make `config.txt` and just paste next code.<br>
 ```
 force_turbo=1
 arm_freq=1200
 ```
 
 # VVVF pin out
-This number is BCM GPIO number.
+This number is the BCM GPIO number.
 - PIN_U_HIGH_2 12
 - PIN_U_HIGH_1 13
 - PIN_U_LOW_1 11
@@ -75,7 +75,7 @@ This number is BCM GPIO number.
 - LED_PIN 47
 
 # Function pin out
-This number is BCM GPIO number
+This number is the BCM GPIO number
 
 ## Mascon (Speed controller)
 ### pin out
@@ -84,11 +84,11 @@ This number is BCM GPIO number
  - mascon_3 27
  - mascon_4 22
 
-Inside the program, it will generate a integer by using mascon_1 ~ mason_4.<br>
-This is the how integer will be.
+Inside the program, this will generate a integer by using mascon_1 ~ mason_4.<br>
+This is the how the integer will be.
 `mascon_status_value = input(mascon_1) | input(mascon_2)<<1 | input(mascon_3)<<2 | input(mascon_4)<<3`<br>
 
-When mascon_status_value equals to 4 , it will not change its vvvf speed.
+When mascon_status_value equals to 4 , the motor will remain at the same speed.
 If it is less than 4 (3,2,1,0), vvvf frequency will decrease. 0 is most strong frequency decrease.
 If it is more than 4 (5,6,7,8), vvvf frequency will increase. 8 is most strong frequency increase.
 
@@ -98,5 +98,5 @@ If it is more than 4 (5,6,7,8), vvvf frequency will increase. 8 is most strong f
  - button_SEL 8
  - button_L 18
 
-When button_SEL is pressed, it will stop vvvf system.And sets all of vvvf pin to low.
-When button_R/L is pressed, it will change vvvf sound.
+When button_SEL is pressed, it will stop the vvvf inverter and set all of the vvvf pins to low.
+When button_R/L is pressed, it will change the vvvf sound.
