@@ -15,7 +15,7 @@ Please reference this github url if you upload on youtube or other websites.
 
 # references
 https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf<br>
-https://github.com/licux/BareMetalInvaders (I borrowed some cord from here.)
+https://github.com/licux/BareMetalInvaders (I borrowed some code from here.)
 
 # requirements
 You need to install cross compiler.<br>
