@@ -1,0 +1,1 @@
+Added a transsistor and changed connection on isolator input.
