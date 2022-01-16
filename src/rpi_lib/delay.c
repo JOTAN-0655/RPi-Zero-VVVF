@@ -24,9 +24,8 @@ volatile unsigned long long get_systime(void) {
     chi = *(volatile unsigned int *) SYST_CHI;
     clo = *(volatile unsigned int *) SYST_CLO;
   }
-  t = chi;
-  t = t << 32;
-  t |= clo;
+  t = (unsigned long long)chi << 32;
+  t |= (unsigned long long)clo;
   return t;
 }
 

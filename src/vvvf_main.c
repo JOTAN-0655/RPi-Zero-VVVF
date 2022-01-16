@@ -7,6 +7,7 @@
 #include "rpi_lib/rpi_address.h"
 
 //#define ENABLE_MASCON_OFF
+#define DISABLE_DEBUG_PIN
 
 //PIN DEFINE
 #define PIN_U_HIGH_2 12
@@ -57,6 +58,7 @@ void led_low()
 	led_toggle_v = 0;
 }
 
+
 char debug_pin_stat = 0;
 void debug_pin_toggle()
 {
@@ -65,12 +67,17 @@ void debug_pin_toggle()
 	else
 		debug_pin_low();
 }
+
+
 void debug_pin_high()
 {
-
+#ifndef DISABLE_DEBUG_PIN
 	digitalWrite_special(1 << debug_PIN,HIGH); // 1 << debug_PIN
+#endif
 	debug_pin_stat = 1;
 }
+
+
 void debug_pin_low()
 {
 	digitalWrite_special(1 << debug_PIN,LOW); // 1 << debug_PIN
@@ -85,16 +92,23 @@ void debug_pin_2_toggle()
 	else
 		debug_pin_2_low();
 }
+
+
 void debug_pin_2_high()
 {
+#ifndef DISABLE_DEBUG_PIN
 	digitalWrite_special(1 << debug_PIN_2,HIGH); // 1 << debug_PIN_2
+#endif
 	debug_pin_2_stat = 1;
 }
+
 void debug_pin_2_low()
 {
 	digitalWrite_special(1 << debug_PIN_2,LOW); // 1 << debug_PIN_2
 	debug_pin_2_stat = 0;
 }
+
+
 
 void all_off()
 {
@@ -341,12 +355,9 @@ int pin_run(int mode)
 {
 	int return_val = 0;
 
-	
 	bool brake = false;
 	bool mascon_off = false;
 	bool free_run = false;
-
-	unsigned long long start_system_time = 0, end_targer_system_time = 0;
 
 	led_high();
 
@@ -358,8 +369,8 @@ int pin_run(int mode)
 
 	while (1)
 	{
-		start_system_time = get_systime();
-		end_targer_system_time = start_system_time + 17;
+		unsigned long long start_system_time = get_systime();
+		unsigned long long end_targer_system_time = start_system_time + 17;
 		sin_time += 0.000017;
 		saw_time += 0.000017;
 
@@ -531,6 +542,7 @@ int pin_run(int mode)
 		set_phase(stat_U,stat_V,stat_W);
 		
 		while (end_targer_system_time > get_systime());
+		
 		debug_pin_toggle();
 	}
 	led_low();
@@ -543,8 +555,10 @@ int pin_run(int mode)
 int main(void)
 {
 	InitializeGpio();
+
 	led_low();
 	debug_pin_low();
+	debug_pin_2_low();
 
 	initialize_vvvf_pin();
 	reset_all_variables();
