@@ -62,8 +62,8 @@ void reset_all_variables();
 int get_random_freq(int base_freq, int range);
 double get_pattern_random(int lowest, int highest,int interval_count);
 
-Wave_Values calculate_common(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
-Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,bool dipolar);
+Wave_Values calculate_two_level(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
+Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,double dipolar);
 
 Wave_Values calculate_E231(Control_Values cv);
 Wave_Values calculate_207(Control_Values cv);

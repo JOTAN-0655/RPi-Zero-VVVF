@@ -164,7 +164,7 @@ double get_pattern_random(int lowest, int highest, int interval_count)
 	return random_freq;
 }
 
-Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude, bool dipolar)
+Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude, double dipolar)
 {
 	if (pulse_mode == Not_In_Sync)
 		saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
@@ -181,7 +181,7 @@ Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle
 	if ((int)pulse_mode > (int)P_61)
 		saw_value = -saw_value;
 
-	double changed_saw = (dipolar == 1) ? 2 : 0.5 * saw_value;
+	double changed_saw = (dipolar != -1) ? dipolar : 0.5 * saw_value;
 	int pwm_value = get_pwm_value(sin_value, changed_saw + 0.5) + get_pwm_value(sin_value, changed_saw - 0.5);
 
 	Wave_Values wv;
@@ -191,28 +191,28 @@ Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle
 	return wv;
 }
 
-Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude)
+Wave_Values calculate_two_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude)
 {
 
-	switch((int)pulse_mode){
-		case P_Wide_3:
-			return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, false);
-		case SP_Wide_3:
-			return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, true);
-		case P_5:
-			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
-		case SP_5:
-			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
-		case P_7:
-			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
-		case SP_7:
-			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
-		case P_11:
-			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
-		case SP_11:
-			return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+	switch ((int)pulse_mode)
+	{
+	case P_Wide_3:
+		return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, false);
+	case SP_Wide_3:
+		return get_Wide_P_3(sin_time, sin_angle_freq, initial_phase, amplitude, true);
+	case P_5:
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+	case SP_5:
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+	case P_7:
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+	case SP_7:
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
+	case P_11:
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), false);
+	case SP_11:
+		return get_P_with_saw(sin_time, sin_angle_freq, initial_phase, amplitude, get_Pulse_Num(pulse_mode), true);
 	}
-	
 
 	if (pulse_mode == Not_In_Sync)
 		saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
@@ -240,49 +240,97 @@ Wave_Values calculate_common(Pulse_Mode pulse_mode, double expect_saw_angle_freq
 
 Wave_Values calculate_E231(Control_Values cv)
 {
-	mascon_off_div = 680;
-	double amplitude = get_Amplitude(cv.wave_stat, 65);
+	double amplitude = 0;
 	double expect_saw_angle_freq = 0;
-	Pulse_Mode pulse_mode;
-	if (cv.free_run && !cv.mascon_on && cv.wave_stat > 67)
-    {
-		cv.wave_stat = 67;
-		pin_run_wave_stat = 67;
-	}
-	else if(cv.free_run && cv.mascon_on && cv.wave_stat > 67)
-    {
-		pin_run_wave_stat = sin_angle_freq * M_1_2PI;
-		cv.wave_stat = pin_run_wave_stat;
-		
-	}
+	Pulse_Mode pulse_mode = P_1;
+	if (cv.brake)
+	{
+		mascon_off_div = 24000;
+		amplitude = get_Amplitude(cv.wave_stat, 73);
 
+#ifdef ENABLE_MASCON_OFF
+		if (cv.free_run && !cv.mascon_on && cv.wave_stat > 73)
+		{
+			cv.wave_stat = 73;
+			pin_run_wave_stat = 73;
+		}
 
-	if (cv.wave_stat > 67)
-		pulse_mode = P_1;
-	else if (cv.wave_stat > 60)
-	{
-		pulse_mode = P_Wide_3;
-		amplitude = 0.8 + 0.2 / 8.0 * (cv.wave_stat - 60);
-	}
-	else if (49 <= cv.wave_stat && cv.wave_stat <= 60)
-	{
-		double expect_saw_freq = 710 + (1750 - 710) / 11 * (cv.wave_stat - 49);
-		expect_saw_angle_freq = M_2PI * expect_saw_freq;
-		pulse_mode = Not_In_Sync;
-	}
-	else if (23 <= cv.wave_stat && cv.wave_stat < 50)
-	{
-		double expect_saw_freq = 1045 + (710 - 1045) / 26 * (cv.wave_stat - 23);
-		expect_saw_angle_freq = M_2PI * expect_saw_freq;
-		pulse_mode = Not_In_Sync;
+		else if (cv.free_run && cv.mascon_on && cv.wave_stat > 73)
+		{
+			cv.wave_stat = sin_angle_freq * M_1_2PI;
+			pin_run_wave_stat = sin_angle_freq * M_1_2PI;
+		}
+#endif
+
+		if (cv.wave_stat > 73)
+			pulse_mode = P_1;
+		else if (cv.wave_stat > 67)
+		{
+			pulse_mode = P_Wide_3;
+			amplitude = 0.8 + 0.1 / 8.0 * (cv.wave_stat - 67);
+		}
+		else if (cv.wave_stat >= 56)
+		{
+			double expect_saw_freq = 700 + (1600 - 700) / 11 * (cv.wave_stat - 56);
+			expect_saw_angle_freq = M_2PI * expect_saw_freq;
+			pulse_mode = Not_In_Sync;
+		}
+		else if (cv.wave_stat >= 29)
+		{
+			double expect_saw_freq = 1045 + (700 - 1045) / (55.9 - 29) * (cv.wave_stat - 29);
+			expect_saw_angle_freq = M_2PI * expect_saw_freq;
+			pulse_mode = Not_In_Sync;
+		}
+		else
+		{
+			expect_saw_angle_freq = 1045 * M_2PI;
+			pulse_mode = Not_In_Sync;
+		}
 	}
 	else
 	{
-		expect_saw_angle_freq = 1045 * M_2PI;
-		pulse_mode = Not_In_Sync;
+		mascon_off_div = 12000;
+		amplitude = get_Amplitude(cv.wave_stat, 65);
+
+		if (cv.free_run && !cv.mascon_on && cv.wave_stat > 67)
+		{
+			cv.wave_stat = 67;
+			pin_run_wave_stat = 67;
+		}
+
+		else if (cv.free_run && cv.mascon_on && cv.wave_stat > 67)
+		{
+			cv.wave_stat = sin_angle_freq * M_1_2PI;
+			pin_run_wave_stat = sin_angle_freq * M_1_2PI;
+		}
+
+		if (cv.wave_stat > 67)
+			pulse_mode = P_1;
+		else if (cv.wave_stat > 60)
+		{
+			pulse_mode = P_Wide_3;
+			amplitude = 0.8 + 0.2 / 8.0 * (cv.wave_stat - 60);
+		}
+		else if (cv.wave_stat >= 49)
+		{
+			double expect_saw_freq = 710 + (1750 - 710) / 11 * (cv.wave_stat - 49);
+			expect_saw_angle_freq = M_2PI * expect_saw_freq;
+			pulse_mode = Not_In_Sync;
+		}
+		else if (cv.wave_stat >= 23)
+		{
+			double expect_saw_freq = 1045 + (710 - 1045) / (48.9 - 23) * (cv.wave_stat - 23);
+			expect_saw_angle_freq = M_2PI * expect_saw_freq;
+			pulse_mode = Not_In_Sync;
+		}
+		else
+		{
+			expect_saw_angle_freq = 1045 * M_2PI;
+			pulse_mode = Not_In_Sync;
+		}
 	}
 
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_207(Control_Values cv)
@@ -348,7 +396,7 @@ Wave_Values calculate_207(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_doremi(Control_Values cv)
@@ -418,7 +466,7 @@ Wave_Values calculate_doremi(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_E235(Control_Values cv)
@@ -503,7 +551,7 @@ Wave_Values calculate_E209(Control_Values cv)
 		wv.pwm_value = 0;
 		return wv;
 	}
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_9820_mitsubishi(Control_Values cv)
@@ -541,7 +589,7 @@ Wave_Values calculate_9820_mitsubishi(Control_Values cv)
 		pulse_Mode = Not_In_Sync;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_9820_hitachi(Control_Values cv)
@@ -569,7 +617,7 @@ Wave_Values calculate_9820_hitachi(Control_Values cv)
 		pulse_Mode = Not_In_Sync;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_E233(Control_Values cv)
@@ -608,7 +656,7 @@ Wave_Values calculate_E233(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_silent(Control_Values cv)
@@ -624,7 +672,7 @@ Wave_Values calculate_silent(Control_Values cv)
 		expect_saw_angle_freq = get_random_freq(550, 100) * M_2PI;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_mitsubishi_gto(Control_Values cv)
@@ -668,7 +716,7 @@ Wave_Values calculate_mitsubishi_gto(Control_Values cv)
 		pulse_Mode = Not_In_Sync;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_toyo_IGBT(Control_Values cv)
@@ -694,7 +742,7 @@ Wave_Values calculate_toyo_IGBT(Control_Values cv)
 			pulse_Mode = Not_In_Sync;
 		}
 
-		return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+		return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 	}
 	else
 	{
@@ -717,7 +765,7 @@ Wave_Values calculate_toyo_IGBT(Control_Values cv)
 			pulse_Mode = Not_In_Sync;
 		}
 
-		return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+		return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 	}
 }
 
@@ -763,7 +811,7 @@ Wave_Values calculate_Famima(Control_Values cv)
 		pulse_mode = Not_In_Sync;
 	}
 
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_real_doremi(Control_Values cv)
@@ -832,7 +880,7 @@ Wave_Values calculate_real_doremi(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_toubu_50050(Control_Values cv)
@@ -871,7 +919,7 @@ Wave_Values calculate_toubu_50050(Control_Values cv)
 		expect_saw_angle_freq = get_random_freq((int)base_freq, 100) * M_2PI;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_207_1000_update(Control_Values cv)
@@ -931,7 +979,7 @@ Wave_Values calculate_207_1000_update(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_225_5100_mitsubishi(Control_Values cv)
@@ -974,7 +1022,7 @@ Wave_Values calculate_225_5100_mitsubishi(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_321_hitachi(Control_Values cv)
@@ -1020,7 +1068,7 @@ Wave_Values calculate_321_hitachi(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_toyo_GTO(Control_Values cv)
@@ -1109,7 +1157,7 @@ Wave_Values calculate_toyo_GTO(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_tokyu_9000_hitachi_gto(Control_Values cv)
@@ -1187,7 +1235,7 @@ Wave_Values calculate_tokyu_9000_hitachi_gto(Control_Values cv)
 			pulse_mode = Not_In_Sync;
 		}
 	}
-	return calculate_common(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_toei_6300_3(Control_Values cv)
@@ -1225,7 +1273,7 @@ Wave_Values calculate_toei_6300_3(Control_Values cv)
 		pulse_Mode = Not_In_Sync;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_keihan_13000_toyo_IGBT(Control_Values cv)
@@ -1249,7 +1297,7 @@ Wave_Values calculate_keihan_13000_toyo_IGBT(Control_Values cv)
 		pulse_Mode = Not_In_Sync;
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_tokyuu_5000(Control_Values cv)
@@ -1323,7 +1371,7 @@ Wave_Values calculate_tokyuu_5000(Control_Values cv)
 	if (!cv.mascon_on && cv.free_run && cv.wave_stat < 23)
 		amplitude = 0;
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_keio_8000_gto(Control_Values cv)
@@ -1397,7 +1445,7 @@ Wave_Values calculate_keio_8000_gto(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_tokyuu_1000_1500_IGBT(Control_Values cv)
@@ -1459,7 +1507,7 @@ Wave_Values calculate_tokyuu_1000_1500_IGBT(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_E233_3000(Control_Values cv)
@@ -1545,7 +1593,7 @@ Wave_Values calculate_E233_3000(Control_Values cv)
 		}
 	}
 
-	return calculate_common(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
+	return calculate_two_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude);
 }
 
 Wave_Values calculate_jre_209_mitsubishi_gto(Control_Values cv)
@@ -1603,5 +1651,5 @@ Wave_Values calculate_jre_209_mitsubishi_gto(Control_Values cv)
 			expect_saw_angle_freq = M_2PI * 114;
 		}
 	}
-	return calculate_three_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude, false);
+	return calculate_three_level(pulse_Mode, expect_saw_angle_freq, cv.initial_phase, amplitude, -1);
 }
