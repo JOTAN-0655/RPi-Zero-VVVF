@@ -1,13 +1,5 @@
 #include "rpi_lib/gpio.h"
 
-
-typedef struct 
-{
-    double sin_value;
-    double saw_value;
-    int pwm_value;
-} Wave_Values;
-
 typedef struct {
 	bool brake;
 	bool mascon_on;
@@ -39,12 +31,12 @@ double get_saw_value_simple(double x);
 
 double get_saw_value(double time, double angle_frequency, double initial_phase);
 double get_sin_value(double time, double angle_frequency, double initial_phase, double amplitude);
-int get_pwm_value(double sin_value, double saw_value);
+char get_pwm_value(double sin_value, double saw_value);
 
 
 double get_Amplitude(double freq,double max_freq);
-Wave_Values get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage,double carrier_mul,bool saw_oppose);
-Wave_Values get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage,bool saw_oppose);
+char get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage,double carrier_mul,bool saw_oppose);
+char get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage,bool saw_oppose);
 int get_Pulse_Num(Pulse_Mode mode);
 
 //sin value definitions
@@ -62,32 +54,32 @@ void reset_all_variables();
 int get_random_freq(int base_freq, int range);
 double get_pattern_random(int lowest, int highest,int interval_count);
 
-Wave_Values calculate_two_level(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
-Wave_Values calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,double dipolar);
+char calculate_two_level(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
+char calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,double dipolar);
 
-Wave_Values calculate_E231(Control_Values cv);
-Wave_Values calculate_207(Control_Values cv);
-Wave_Values calculate_doremi(Control_Values cv);
-Wave_Values calculate_E235(Control_Values cv);
-Wave_Values calculate_E209(Control_Values cv);
-Wave_Values calculate_9820_mitsubishi(Control_Values cv);
-Wave_Values calculate_9820_hitachi(Control_Values);
-Wave_Values calculate_E233(Control_Values cv);
-Wave_Values calculate_silent(Control_Values cv);
-Wave_Values calculate_mitsubishi_gto(Control_Values cv);
-Wave_Values calculate_toyo_IGBT(Control_Values cv);
-Wave_Values calculate_Famima(Control_Values cv);
-Wave_Values calculate_real_doremi(Control_Values cv);
-Wave_Values calculate_toubu_50050(Control_Values cv);
-Wave_Values calculate_207_1000_update(Control_Values cv);
-Wave_Values calculate_225_5100_mitsubishi(Control_Values cv);
-Wave_Values calculate_321_hitachi(Control_Values cv);
-Wave_Values calculate_toyo_GTO(Control_Values cv);
-Wave_Values calculate_tokyu_9000_hitachi_gto(Control_Values cv);
-Wave_Values calculate_toei_6300_3(Control_Values cv);
-Wave_Values calculate_keihan_13000_toyo_IGBT(Control_Values cv);
-Wave_Values calculate_tokyuu_5000(Control_Values cv);
-Wave_Values calculate_keio_8000_gto(Control_Values cv);
-Wave_Values calculate_tokyuu_1000_1500_IGBT(Control_Values cv);
-Wave_Values calculate_E233_3000(Control_Values cv);
-Wave_Values calculate_jre_209_mitsubishi_gto(Control_Values cv);
+char calculate_E231(Control_Values *cv);
+char calculate_207(Control_Values *cv);
+char calculate_doremi(Control_Values *cv);
+char calculate_E235(Control_Values *cv);
+char calculate_E209(Control_Values *cv);
+char calculate_9820_mitsubishi(Control_Values *cv);
+char calculate_9820_hitachi(Control_Values *cv);
+char calculate_E233(Control_Values *cv);
+char calculate_silent(Control_Values *cv);
+char calculate_mitsubishi_gto(Control_Values *cv);
+char calculate_toyo_IGBT(Control_Values *cv);
+char calculate_Famima(Control_Values *cv);
+char calculate_real_doremi(Control_Values *cv);
+char calculate_toubu_50050(Control_Values *cv);
+char calculate_207_1000_update(Control_Values *cv);
+char calculate_225_5100_mitsubishi(Control_Values *cv);
+char calculate_321_hitachi(Control_Values *cv);
+char calculate_toyo_GTO(Control_Values *cv);
+char calculate_tokyu_9000_hitachi_gto(Control_Values *cv);
+char calculate_toei_6300_3(Control_Values *cv);
+char calculate_keihan_13000_toyo_IGBT(Control_Values *cv);
+char calculate_tokyuu_5000(Control_Values *cv);
+char calculate_keio_8000_gto(Control_Values *cv);
+char calculate_tokyuu_1000_1500_IGBT(Control_Values *cv);
+char calculate_E233_3000(Control_Values *cv);
+char calculate_jre_209_mitsubishi_gto(Control_Values *cv);

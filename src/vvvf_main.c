@@ -149,20 +149,20 @@ void initialize_vvvf_pin()
 	all_off();
 }
 
-int get_Mascon_status()
+char get_Mascon_status()
 {
 	int bit1 = digitalRead(mascon_1);
 	int bit2 = digitalRead(mascon_2);
 	int bit3 = digitalRead(mascon_3);
 	int bit4 = digitalRead(mascon_4);
 
-	int status = bit1 | bit2 << 1 | bit3 << 2 | bit4 << 3;
+	char status = (char)bit1 | (char)(bit2 << 1) | (char)(bit3 << 2) | (char)(bit4 << 3);
 	return status;
 }
 
 char ignore_pin_change = 0;
-int pre_phase_0_stat = 0, pre_phase_1_stat = 0, pre_phase_2_stat = 0;
-int get_phase_stat(char phase)
+char pre_phase_0_stat = 0, pre_phase_1_stat = 0, pre_phase_2_stat = 0;
+char get_phase_stat(char phase)
 {
 	if (phase == 0)
 		return pre_phase_0_stat;
@@ -171,7 +171,7 @@ int get_phase_stat(char phase)
 	else
 		return pre_phase_2_stat;
 }
-void set_phase_stat(char phase, int stat)
+void set_phase_stat(char phase, char stat)
 {
 	if (phase == 0)
 		pre_phase_0_stat = stat;
@@ -219,7 +219,7 @@ char get_pin_L_1(char phase)
  * @param stat 
  * @return Gpio_Set_Data 
  */
-Gpio_Set_Data get_phase_set(int stat)
+Gpio_Set_Data get_phase_set(char stat)
 {
 	char H_1,H_2,L_1,L_2;
 	if (stat == 0)
@@ -253,15 +253,15 @@ Gpio_Set_Data get_phase_set(int stat)
 	return set_data;
 }
 
-void set_phase(int stat_U,int stat_V,int stat_W)
+void set_phase(char stat_U,char stat_V,char stat_W)
 {
 	if (ignore_pin_change == 1)
 		return;
 
 	unsigned int set_to_high = 0, set_to_low = 0;
 
-	for(int phase = 0; phase < 3;phase++){
-		int p_s = stat_U;
+	for(char phase = 0; phase < 3;phase++){
+		char p_s = stat_U;
 		if(phase == 1) p_s = stat_V;
 		else if(phase == 2) p_s = stat_W;
 
@@ -286,7 +286,7 @@ void set_phase(int stat_U,int stat_V,int stat_W)
 }
 
 char total_modes = 23;
-Wave_Values get_Value_mode(int mode, Control_Values cv)
+char get_Value_mode(int mode, Control_Values *cv)
 {
 	if (mode == 0)
 		return calculate_207(cv);
@@ -377,7 +377,7 @@ int pin_run(int mode)
 		sin_time += 0.000017;
 		saw_time += 0.000017;
 
-		int stat_U = 0, stat_V = 0, stat_W = 0;
+		char stat_U = 0, stat_V = 0, stat_W = 0;
 		for (int i = 0; i < 3; i++)
 		{
 			debug_pin_2_toggle();
@@ -385,8 +385,7 @@ int pin_run(int mode)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
 			Control_Values cv = {brake,!mascon_off, free_run ,initial_phase,pin_run_wave_stat};
-			Wave_Values wv = get_Value_mode(mode, cv);
-			int require_stat = wv.pwm_value;
+			char require_stat = get_Value_mode(mode, &cv);
 			if (i == 0)
 				stat_U = require_stat;
 			else if (i == 1)
@@ -398,7 +397,7 @@ int pin_run(int mode)
 
 		debug_pin_2_low();
 
-		int dead_time_U = stat_U,dead_time_V = stat_V,dead_time_W = stat_W;
+		char dead_time_U = stat_U,dead_time_V = stat_V,dead_time_W = stat_W;
 		if (get_phase_stat(0) != stat_U){
 			dead_time_U = 3;
 			set_phase_stat(0,stat_U);
@@ -419,7 +418,7 @@ int pin_run(int mode)
 
 		//sine angle freq change etc..
 		double sin_new_angle_freq = sin_angle_freq;
-		char mascon_status = (char)get_Mascon_status();
+		char mascon_status = get_Mascon_status();
 		if (mascon_status - 4 > 0)
 		{
 			sin_new_angle_freq += 0.00026179938779915 * (mascon_status - 4);

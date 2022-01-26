@@ -31,6 +31,7 @@ extern void digitalWrite(unsigned int pin, unsigned int value);
 extern void digitalWrite_special(unsigned int pins, unsigned int value);
 extern int digitalRead(unsigned int pin);
 
+void reset_detect();
 void setFallDetect(unsigned int pin,bool set,bool async);
 void setRaiseDetect(unsigned int pin,bool set,bool async);
 void setLowDetect(unsigned int pin,bool set);

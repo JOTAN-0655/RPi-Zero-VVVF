@@ -14,13 +14,13 @@ void debug_pin_2_low();
 
 void all_off();
 void initialize_vvvf_pin();
-int get_Mascon_status();
+char get_Mascon_status();
 
 // stat = 1 => pin_H = 1,pin_L=0
 // stat = 0 => pin_H = 0,pin_L=0
 // stat = -1 => pin_H = 0,pin_L=1
-int get_phase_stat(char phase);
-void set_phase_stat(char phase,int stat);
+char get_phase_stat(char phase);
+void set_phase_stat(char phase,char stat);
 
 typedef struct {
     char H_2;
@@ -34,10 +34,10 @@ char get_pin_L_2(char phase);
 char get_pin_H_1(char phase);
 char get_pin_L_1(char phase);
 
-Gpio_Set_Data get_phase_set(int stat);
-void set_phase(int stat_U,int stat_V,int stat_W);
+Gpio_Set_Data get_phase_set(char stat);
+void set_phase(char stat_U,char stat_V,char stat_W);
 
-Wave_Values get_Value_mode(int mode,Control_Values cv);
+char get_Value_mode(int mode,Control_Values *cv);
 
 extern int mascon_off_div;
 extern double pin_run_wave_stat;

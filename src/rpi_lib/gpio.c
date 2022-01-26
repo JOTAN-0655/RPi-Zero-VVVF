@@ -35,6 +35,8 @@ void InitializeGpio(void){
 	*GPPUDCKL0 = 0;
 	*GPPUDCKL1 = 0;
 
+	reset_detect();
+	
 	*GPIFSEL0 = 0;
 	*GPIFSEL1 = 0;
 	*GPIFSEL2 = 0;
@@ -197,6 +199,21 @@ int digitalRead(unsigned int pin)
 	return LOW;
 }
 
+void reset_detect(){
+	*GPAFEN0 = 0x00;
+	*GPAFEN1 = 0x00;
+	*GPFEN0 = 0x00;
+	*GPFEN1 = 0x00;
+	*GPAREN0 = 0x00;
+	*GPAREN1 = 0x00;
+	*GPREN0 = 0x00;
+	*GPREN1 = 0x00;
+	*GPLEN0 = 0x00;
+	*GPLEN1 = 0x00;
+	*GPHEN0 = 0x00;
+	*GPHEN1 = 0x00;
+}
+
 void setFallDetect(unsigned int pin,bool set,bool async){
 	volatile unsigned int* addr;
 	if(pin < 0 || pin > 53) return;
@@ -207,8 +224,8 @@ void setFallDetect(unsigned int pin,bool set,bool async){
 		if(pin <= 31) addr = GPFEN0;
 		else addr = GPFEN1;
 	}
-	if(set==true) *addr |= (long)1<<(pin%32);
-	else *addr &= ~((long)1<<(pin%32));
+	if(set==true) *addr |= (long)1<<(pin&31);
+	else *addr &= ~((long)1<<(pin&31));
 }
 
 void setRaiseDetect(unsigned int pin,bool set,bool async){
