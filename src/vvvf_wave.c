@@ -245,7 +245,7 @@ Wave_Values calculate_E231(Control_Values cv)
 	Pulse_Mode pulse_mode = P_1;
 	if (cv.brake)
 	{
-		mascon_off_div = 24000;
+		mascon_off_div = 7540;
 		amplitude = get_Amplitude(cv.wave_stat, 73);
 
 #ifdef ENABLE_MASCON_OFF
@@ -289,7 +289,7 @@ Wave_Values calculate_E231(Control_Values cv)
 	}
 	else
 	{
-		mascon_off_div = 12000;
+		mascon_off_div = 3520;
 		amplitude = get_Amplitude(cv.wave_stat, 65);
 
 		if (cv.free_run && !cv.mascon_on && cv.wave_stat > 67)

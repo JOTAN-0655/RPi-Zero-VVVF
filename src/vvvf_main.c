@@ -8,6 +8,7 @@
 
 //#define ENABLE_MASCON_OFF
 #define DISABLE_DEBUG_PIN
+//#define ENABLE_3_LEVEL
 
 //PIN DEFINE
 #define PIN_U_HIGH_2 12
@@ -268,11 +269,13 @@ void set_phase(int stat_U,int stat_V,int stat_W)
 		if(gpio.H_2) set_to_high |= 1 << get_pin_H_2(phase);
 		else set_to_low |= 1 << get_pin_H_2(phase);
 
+#ifdef ENABLE_3_LEVEL
 		if(gpio.H_1) set_to_high |= 1 << get_pin_H_1(phase);
 		else set_to_low |= 1 << get_pin_H_1(phase);
 
 		if(gpio.L_1) set_to_high |= 1 << get_pin_L_1(phase);
 		else set_to_low |= 1 << get_pin_L_1(phase);
+#endif
 
 		if(gpio.L_2) set_to_high |= 1 << get_pin_L_2(phase);
 		else set_to_low |= 1 << get_pin_L_2(phase);
