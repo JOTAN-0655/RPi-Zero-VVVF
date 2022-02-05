@@ -54,21 +54,6 @@ void reset_all_variables();
 int get_random_freq(int base_freq, int range);
 double get_pattern_random(int lowest, int highest,int interval_count);
 
-typedef struct {
-	Pulse_Mode mode;
-	double saw_angle_freq;
-	double initial_phase;
-	double amplitude;
-} Two_Level_Parameter;
-
-typedef struct {
-	Pulse_Mode pulse_mode;
-	double saw_angle_freq;
-	double initial_phase;
-	double amplitude;
-	double bipolar;
-} Three_Level_Parameter;
-
 char calculate_two_level(Pulse_Mode pulse_mode,double expect_saw_angle_freq,double initial_phase,double amplitude);
 char calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, double initial_phase, double amplitude,double dipolar);
 
