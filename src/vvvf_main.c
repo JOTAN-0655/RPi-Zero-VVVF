@@ -7,7 +7,7 @@
 #include "rpi_lib/rpi_address.h"
 
 //#define ENABLE_MASCON_OFF
-#define DISABLE_DEBUG_PIN
+//#define DISABLE_DEBUG_PIN
 //#define ENABLE_3_LEVEL
 
 //PIN DEFINE
@@ -554,6 +554,7 @@ int pin_run(int mode)
 	return return_val;
 }
 
+
 int main(void)
 {
 	InitializeGpio();
@@ -571,7 +572,7 @@ int main(void)
 		int change = pin_run(mode);
 		if (change == 0)
 			break;
-		delay_ms(500);
+		delay_ms(100);
 		mode += change;
 		if (mode < 0)
 			mode = total_modes;
