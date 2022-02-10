@@ -589,7 +589,7 @@ int pin_run()
 
 		set_phase(stat_U,stat_V,stat_W);
 		
-		while (end_targer_system_time > get_systime());
+		//while (end_targer_system_time > get_systime());
 		
 		debug_pin_toggle();
 	}
@@ -613,6 +613,7 @@ int main(void)
 	reset_all_variables();
 
 	int mode = 0;
+	set_Calculation_Func(mode);
 	while (1)
 	{
 		int change = pin_run();
