@@ -400,7 +400,7 @@ unsigned int button_press_count = 0;
 int mascon_off_div = 1000;
 double pin_run_wave_stat = 0;
 
-int pin_run(int mode)
+int pin_run()
 {
 	int return_val = 0;
 
@@ -615,7 +615,7 @@ int main(void)
 	int mode = 0;
 	while (1)
 	{
-		int change = pin_run(mode);
+		int change = pin_run();
 		if (change == 0)
 			break;
 		delay_ms(100);

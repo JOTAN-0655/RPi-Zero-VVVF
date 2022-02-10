@@ -41,5 +41,5 @@ void set_Calculation_Func(int mode);
 
 extern int mascon_off_div;
 extern double pin_run_wave_stat;
-int pin_run(int mode);
+int pin_run();
 int main();
