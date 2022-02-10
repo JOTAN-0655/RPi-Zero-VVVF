@@ -37,7 +37,7 @@ char get_pin_L_1(char phase);
 Gpio_Set_Data get_phase_set(char stat);
 void set_phase(char stat_U,char stat_V,char stat_W);
 
-char get_Value_mode(int mode,Control_Values *cv);
+void set_Calculation_Func(int mode);
 
 extern int mascon_off_div;
 extern double pin_run_wave_stat;

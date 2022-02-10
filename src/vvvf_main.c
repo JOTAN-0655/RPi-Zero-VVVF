@@ -164,49 +164,76 @@ char ignore_pin_change = 0;
 char pre_phase_0_stat = 0, pre_phase_1_stat = 0, pre_phase_2_stat = 0;
 char get_phase_stat(char phase)
 {
-	if (phase == 0)
-		return pre_phase_0_stat;
-	else if (phase == 1)
-		return pre_phase_1_stat;
-	else
-		return pre_phase_2_stat;
+	switch(phase){
+		case 0:
+			return pre_phase_0_stat;
+		case 1:
+			return pre_phase_1_stat;
+		default:
+			return pre_phase_2_stat;
+	}
 }
 void set_phase_stat(char phase, char stat)
 {
-	if (phase == 0)
-		pre_phase_0_stat = stat;
-	else if (phase == 1)
-		pre_phase_1_stat = stat;
-	else
-		pre_phase_2_stat = stat;
+	switch(phase){
+		case 0:
+			pre_phase_0_stat = stat;
+			break;
+		case 1:
+			pre_phase_1_stat = stat;
+			break;
+		default:
+			pre_phase_2_stat = stat;
+			break;
+	}
 }
 
 char get_pin_H_2(char phase)
 {
-	if(phase == 0) return PIN_U_HIGH_2;
-	else if(phase == 1) return PIN_V_HIGH_2;
-	else return PIN_W_HIGH_2;
+	switch(phase){
+		case 0:
+			return PIN_U_HIGH_2;
+		case 1:
+			return PIN_V_HIGH_2;
+		default:
+			return PIN_W_HIGH_2;
+	}
 }
 
 char get_pin_L_2(char phase)
 {
-	if(phase == 0) return PIN_U_LOW_2;
-	else if(phase == 1) return PIN_V_LOW_2;
-	else return PIN_W_LOW_2;
+	switch(phase){
+		case 0:
+			return PIN_U_LOW_2;
+		case 1:
+			return PIN_V_LOW_2;
+		default:
+			return PIN_W_LOW_2;
+	}
 }
 
 char get_pin_H_1(char phase)
 {
-	if(phase == 0) return PIN_U_HIGH_1;
-	else if(phase == 1) return PIN_V_HIGH_1;
-	else return PIN_W_HIGH_1;
+	switch(phase){
+		case 0:
+			return PIN_U_HIGH_1;
+		case 1:
+			return PIN_V_HIGH_1;
+		default:
+			return PIN_W_HIGH_1;
+	}
 }
 
 char get_pin_L_1(char phase)
 {
-	if(phase == 0) return PIN_U_LOW_1;
-	else if(phase == 1) return PIN_V_LOW_1;
-	else return PIN_W_LOW_1;
+	switch(phase){
+		case 0:
+			return PIN_U_LOW_1;
+		case 1:
+			return PIN_V_LOW_1;
+		default:
+			return PIN_W_LOW_1;
+	}
 }
 
 /**
@@ -222,32 +249,31 @@ char get_pin_L_1(char phase)
 Gpio_Set_Data get_phase_set(char stat)
 {
 	char H_1,H_2,L_1,L_2;
-	if (stat == 0)
-	{
+	switch(stat){
+	case 0:
 		H_2 = LOW;
 		H_1 = LOW;
 		L_1 = HIGH;
 		L_2 = HIGH;
-	}
-	else if(stat == 1){
+		break;
+	case 1:
 		H_2 = LOW;
 		H_1 = HIGH;
 		L_1 = HIGH;
 		L_2 = LOW;
-	}
-	else if (stat == 2)
-	{
+		break;
+	case 2:
 		H_2 = HIGH;
 		H_1 = HIGH;
 		L_1 = LOW;
 		L_2 = LOW;
-	}
-	else
-	{
+		break;
+	default:
 		H_2 = LOW;
 		H_1 = LOW;
 		L_1 = LOW;
 		L_2 = LOW;
+		break;
 	}
 	Gpio_Set_Data set_data = { H_2,H_1,L_1,L_2 };
 	return set_data;
@@ -286,66 +312,86 @@ void set_phase(char stat_U,char stat_V,char stat_W)
 }
 
 char total_modes = 23;
-char get_Value_mode(int mode, Control_Values *cv)
+char (* calc_func)(Control_Values *);
+void set_Calculation_Func(int mode)
 {
-	if (mode == 0)
-		return calculate_207(cv);
-	else if (mode == 1)
-		return calculate_toyo_GTO(cv);
-	else if (mode == 2)
-		return calculate_doremi(cv);
-	else if (mode == 3)
-		return calculate_E209(cv);
-	else if (mode == 4)
-		return calculate_mitsubishi_gto(cv);
-	else if (mode == 5)
-		return calculate_tokyu_9000_hitachi_gto(cv);
-	else if (mode == 6)
-		return calculate_keio_8000_gto(cv);
-
-	else if (mode == 7)
-		return calculate_E231(cv);
-	else if (mode == 8)
-		return calculate_9820_mitsubishi(cv);
-	else if (mode == 9)
-		return calculate_9820_hitachi(cv);
-	else if (mode == 10)
-		return calculate_E233(cv);
-	else if (mode == 11)
-		return calculate_E235(cv);
-	else if (mode == 12)
-		return calculate_toyo_IGBT(cv);
-	else if (mode == 13)
-		return calculate_toubu_50050(cv);
-	else if (mode == 14)
-		return calculate_207_1000_update(cv);
-	else if (mode == 15)
-		return calculate_225_5100_mitsubishi(cv);
-	else if (mode == 16)
-		return calculate_321_hitachi(cv);
-	else if (mode == 17)
-		return calculate_toei_6300_3(cv);
-	else if (mode == 18)
-		return calculate_keihan_13000_toyo_IGBT(cv);
-	else if (mode == 19)
-		return calculate_tokyuu_5000(cv);
-	else if (mode == 20)
-		return calculate_tokyuu_1000_1500_IGBT(cv);
-	else if (mode == 21)
-		return calculate_E233_3000(cv);
-
-	/*
-	else if(mode == 21)
-		return calculate_jre_209_mitsubishi_gto(cv);
-	*/
-
-	else if (mode == 22) //large time
-		return calculate_Famima(cv);
-	else if (mode == 23)
-		return calculate_real_doremi(cv);
-
-	else
-		return calculate_silent(cv);
+	switch(mode){
+		case 0:
+			calc_func = calculate_207;
+			break;
+		case 1:
+			calc_func = calculate_toyo_GTO;
+			break;
+		case 2:
+			calc_func = calculate_doremi;
+			break;
+		case 3:
+			calc_func = calculate_E209;
+			break;
+		case 4:
+			calc_func = calculate_mitsubishi_gto;
+			break;
+		case 5:
+			calc_func = calculate_tokyu_9000_hitachi_gto;
+			break;
+		case 6:
+			calc_func = calculate_keio_8000_gto;
+			break;
+		case 7:
+			calc_func = calculate_E231;
+			break;
+		case 8:
+			calc_func = calculate_9820_mitsubishi;
+			break;
+		case 9:
+			calc_func = calculate_9820_hitachi;
+			break;
+		case 10:
+			calc_func = calculate_E233;
+			break;
+		case 11:
+			calc_func = calculate_E235;
+			break;
+		case 12:
+			calc_func = calculate_toyo_IGBT;
+			break;
+		case 13:
+			calc_func = calculate_toubu_50050;
+			break;
+		case 14:
+			calc_func = calculate_207_1000_update;
+			break;
+		case 15:
+			calc_func = calculate_225_5100_mitsubishi;
+			break;
+		case 16:
+			calc_func = calculate_321_hitachi;
+			break;
+		case 17:
+			calc_func = calculate_toei_6300_3;
+			break;
+		case 18:
+			calc_func = calculate_keihan_13000_toyo_IGBT;
+			break;
+		case 19:
+			calc_func = calculate_tokyuu_5000;
+			break;
+		case 20:
+			calc_func = calculate_tokyuu_1000_1500_IGBT;
+			break;
+		case 21:
+			calc_func = calculate_E233_3000;
+			break;
+		case 22:
+			calc_func = calculate_Famima;
+			break;
+		case 23:
+			calc_func = calculate_real_doremi;
+			break;
+		default:
+			calc_func = calculate_silent;
+			break;
+	}
 }
 
 char update_pin = 1;
@@ -385,7 +431,7 @@ int pin_run(int mode)
 				continue;
 			double initial_phase = (double)2.094395393195 * (double)i; //(double)2.094395102393195 * (double)i;
 			Control_Values cv = {brake,!mascon_off, free_run ,initial_phase,pin_run_wave_stat};
-			char require_stat = get_Value_mode(mode, &cv);
+			char require_stat = (* calc_func)(&cv);
 			if (i == 0)
 				stat_U = require_stat;
 			else if (i == 1)
@@ -578,6 +624,7 @@ int main(void)
 			mode = total_modes;
 		else if (mode > total_modes)
 			mode = 0;
+		set_Calculation_Func(mode);
 	}
 
 	while (1)
