@@ -50,10 +50,7 @@ Copy `bootcode.bin` , `start.elf` and `kernel.img` that you have built.<br>
 If you want the raspberry pi zero to run faster, make `config.txt` and just paste next code.<br>
 ```
 force_turbo=1
-arm_freq=1000
 ```
-You can enter arm_freq for 1200.<br>
-But I will recommend to not to go over than 1000 since it will go unstable.
 
 
 # VVVF pin out
