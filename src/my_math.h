@@ -1,3 +1,7 @@
+#ifndef MY_MATH_H
+
+#define MY_MATH_H
+
 #define M_2PI 6.2831853071795
 #define M_PI 3.1415926535897
 #define M_PI_2 1.5707963267948
@@ -11,3 +15,5 @@ int mod_i(int a,int b);
 double sin(double radian);
 int my_random();
 int round(double x);
+
+#endif

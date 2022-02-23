@@ -1,4 +1,6 @@
-#include "rpi_lib/gpio.h"
+#ifndef VVVF_MAIN_H
+
+#define VVVF_MAIN_H
 
 void led_toggle();
 void led_high();
@@ -43,3 +45,5 @@ extern int mascon_off_div;
 extern double pin_run_wave_stat;
 int pin_run();
 int main();
+
+#endif

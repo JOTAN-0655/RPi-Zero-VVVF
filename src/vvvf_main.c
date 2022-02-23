@@ -1,44 +1,12 @@
 #include "vvvf_wave.h"
 #include "vvvf_main.h"
 #include "my_math.h"
+#include "vvvf_calculate.h"
+#include "settings.h"
 
 #include "rpi_lib/gpio.h"
 #include "rpi_lib/delay.h"
 #include "rpi_lib/rpi_address.h"
-
-//#define ENABLE_MASCON_OFF
-//#define DISABLE_DEBUG_PIN
-//#define ENABLE_3_LEVEL
-
-//PIN DEFINE
-#define PIN_U_HIGH_2 12
-#define PIN_U_HIGH_1 13
-#define PIN_U_LOW_1 11
-#define PIN_U_LOW_2 21
-
-#define PIN_V_HIGH_2 16
-#define PIN_V_HIGH_1 6
-#define PIN_V_LOW_1 9
-#define PIN_V_LOW_2 26
-
-#define PIN_W_HIGH_2 20
-#define PIN_W_HIGH_1 5
-#define PIN_W_LOW_1 25
-#define PIN_W_LOW_2 19
-
-#define mascon_1 4
-#define mascon_2 17
-#define mascon_3 27
-#define mascon_4 22
-
-#define button_R 7
-#define button_SEL 8
-#define button_L 18
-
-#define debug_PIN_2 23
-#define debug_PIN 24
-#define LED_PIN 47
-
 
 char led_toggle_v = 0;
 void led_toggle()
