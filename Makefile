@@ -25,14 +25,16 @@ vvvf_calculate.o : src/vvvf_calculate.c
 	$(ARMGNU)-gcc $(COPS) -c src/vvvf_calculate.c -o build/vvvf_calculate.o
 my_math.o : src/my_math.c
 	$(ARMGNU)-gcc $(COPS) -c src/my_math.c -o build/my_math.o
+my_switchingangle.o : src/my_switchingangle.c
+	$(ARMGNU)-gcc $(COPS) -c src/my_switchingangle.c -o build/my_switchingangle.o
 
 gpio.o : src/rpi_lib/gpio.c
 	$(ARMGNU)-gcc $(COPS) -c src/rpi_lib/gpio.c -o build/gpio.o
 delay.o : src/rpi_lib/delay.c
 	$(ARMGNU)-gcc $(COPS) -c src/rpi_lib/delay.c -o build/delay.o
 
-build/vvvf_main.elf : memmap start.o vvvf_main.o vvvf_wave.o gpio.o delay.o my_math.o vvvf_calculate.o
-	$(ARMGNU)-ld build/start.o build/vvvf_main.o build/vvvf_wave.o build/my_math.o build/vvvf_calculate.o build/gpio.o build/delay.o -T memmap -o build/vvvf_main.elf
+build/vvvf_main.elf : memmap start.o vvvf_main.o vvvf_wave.o gpio.o delay.o my_math.o vvvf_calculate.o my_switchingangle.o
+	$(ARMGNU)-ld build/start.o build/vvvf_main.o build/vvvf_wave.o build/my_math.o build/my_switchingangle.o build/vvvf_calculate.o build/gpio.o build/delay.o -T memmap -o build/vvvf_main.elf
 	$(ARMGNU)-objdump -D build/vvvf_main.elf > build/vvvf_main.list
 
 kernel.img : build/vvvf_main.elf
