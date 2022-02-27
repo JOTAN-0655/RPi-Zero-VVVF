@@ -8,6 +8,7 @@
 #define M_2_PI 0.6366197723675
 #define M_1_PI 0.3183098861837
 #define M_1_2PI 0.1591549430918
+#define M_PI_180 0.0174532925199
 
 double mod_d(double a, double b);
 int mod_i(int a,int b);

@@ -14,7 +14,18 @@ typedef struct {
 } Control_Values;
 
 typedef enum {
-    Not_In_Sync,P_1, P_Wide_3, P_10 ,P_12,P_18, P_3,P_5,P_7,P_9,P_11,P_13,P_15,P_17,P_19,
+    Async,P_1, P_Wide_3, P_10 ,P_12,P_18, 
+
+	
+	// Current harmonic minimum Pulse width modulation
+	CHMP_3, CHMP_Wide_3, CHMP_5, CHMP_Wide_5, CHMP_7, CHMP_Wide_7,
+	CHMP_9, CHMP_Wide_9, CHMP_11, CHMP_Old_11, CHMP_Wide_11, CHMP_13,
+	CHMP_Old_13, CHMP_Wide_13, CHMP_15, CHMP_Old_15, CHMP_Wide_15,		
+	// Selective harmonic elimination Pulse width modulation
+	SHEP_3, SHEP_5, SHEP_7, SHEP_9, SHEP_11, SHEP_13, SHEP_15,
+	
+	
+	P_3,P_5,P_7,P_9,P_11,P_13,P_15,P_17,P_19,
     P_21,P_23, P_25, P_27, P_29, P_31, P_33, P_35, P_37, P_39, P_41
     , P_43, P_45, P_47, P_49, P_51, P_53, P_55, P_57, P_59, P_61,
 
@@ -34,8 +45,8 @@ typedef enum  {
 
 double get_saw_value_simple(double x);
 
-double get_saw_value(double time, double angle_frequency, double initial_phase);
-double get_sin_value(double time, double angle_frequency, double initial_phase, double amplitude);
+double get_saw_value(double x);
+double get_sin_value(double x, double amplitude);
 char get_pwm_value(double sin_value, double saw_value);
 
 
