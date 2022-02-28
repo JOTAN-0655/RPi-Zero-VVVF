@@ -16,7 +16,7 @@ typedef struct {
 typedef enum {
     Async,P_1, P_Wide_3, P_10 ,P_12,P_18, 
 
-	
+	Async_THI,
 	// Current harmonic minimum Pulse width modulation
 	CHMP_3, CHMP_Wide_3, CHMP_5, CHMP_Wide_5, CHMP_7, CHMP_Wide_7,
 	CHMP_9, CHMP_Wide_9, CHMP_11, CHMP_Old_11, CHMP_Wide_11, CHMP_13,

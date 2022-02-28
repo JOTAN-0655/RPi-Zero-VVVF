@@ -6,7 +6,6 @@
 char calculate_E231(Control_Values *cv);
 char calculate_207(Control_Values *cv);
 char calculate_doremi(Control_Values *cv);
-char calculate_E235(Control_Values *cv);
 char calculate_E209(Control_Values *cv);
 char calculate_9820_mitsubishi(Control_Values *cv);
 char calculate_9820_hitachi(Control_Values *cv);
@@ -29,5 +28,6 @@ char calculate_keio_8000_gto(Control_Values *cv);
 char calculate_tokyuu_1000_1500_IGBT(Control_Values *cv);
 char calculate_E233_3000(Control_Values *cv);
 char calculate_jre_209_mitsubishi_gto(Control_Values *cv);
+char calculate_keikyu_n1000_siemens_gto_2_level(Control_Values *cv);
 
 #endif

@@ -294,31 +294,30 @@ void set_Calculation_Func(int mode)
 			calc_func = calculate_doremi;
 			break;
 		case 3:
+			calc_func = calculate_keikyu_n1000_siemens_gto_2_level;
+		case 4:
 			calc_func = calculate_E209;
 			break;
-		case 4:
+		case 5:
 			calc_func = calculate_mitsubishi_gto;
 			break;
-		case 5:
+		case 6:
 			calc_func = calculate_tokyu_9000_hitachi_gto;
 			break;
-		case 6:
+		case 7:
 			calc_func = calculate_keio_8000_gto;
 			break;
-		case 7:
+		case 8:
 			calc_func = calculate_E231;
 			break;
-		case 8:
+		case 9:
 			calc_func = calculate_9820_mitsubishi;
 			break;
-		case 9:
+		case 10:
 			calc_func = calculate_9820_hitachi;
 			break;
-		case 10:
-			calc_func = calculate_E233;
-			break;
 		case 11:
-			calc_func = calculate_E235;
+			calc_func = calculate_E233;
 			break;
 		case 12:
 			calc_func = calculate_toyo_IGBT;

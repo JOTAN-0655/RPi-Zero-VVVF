@@ -229,51 +229,6 @@ char calculate_doremi(Control_Values *cv)
 	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv->initial_phase, amplitude);
 }
 
-char calculate_E235(Control_Values *cv)
-{
-	double amplitude = get_Amplitude(cv->wave_stat, 54);
-
-	double sin_value = get_sin_value(sin_time, sin_angle_freq, cv->initial_phase, amplitude);
-	double saw_value;
-	if (cv->wave_stat > 54)
-	{
-
-		saw_angle_freq = sin_angle_freq * 15;
-		saw_time = sin_time;
-
-		saw_value = get_saw_value(saw_time, saw_angle_freq, 0);
-	}
-	else
-	{
-
-		if (random_freq_move_count == 0)
-		{
-			//saw_freq = 740;
-			int random_v = my_random();
-			int diff_freq = mod_i(random_v, 30);
-			if (random_v & 0x01)
-				diff_freq = -diff_freq;
-
-			double base_freq = (double)550 + 3.148148148148148 * (cv->wave_stat); //170.0/54.0*(cv->wave_stat);
-
-			double silent_random_freq = base_freq + diff_freq;
-
-			double expect_saw_angle_freq = 2 * M_PI * silent_random_freq;
-			saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
-			saw_angle_freq = expect_saw_angle_freq;
-		}
-		saw_value = get_saw_value(saw_time, saw_angle_freq, 0);
-
-		random_freq_move_count++;
-		if (random_freq_move_count == 100)
-			random_freq_move_count = 0;
-	}
-
-	char pwm_value = get_pwm_value(sin_value, saw_value) << 1;
-
-	return pwm_value;
-}
-
 char calculate_E209(Control_Values *cv)
 {
 	double amplitude = get_Amplitude(cv->wave_stat, 53);
@@ -638,13 +593,13 @@ char calculate_toubu_50050(Control_Values *cv)
 	else if (49 <= cv->wave_stat)
 	{
 		pulse_Mode = Async;
-		double base_freq = (double)680 + 1140 / 9.0 * (cv->wave_stat - 49); //170.0/54.0*(cv->wave_stat);
+		double base_freq = (double)680 + 1140 / 9.0 * (cv->wave_stat - 49); // 170.0/54.0*(cv->wave_stat);
 		expect_saw_angle_freq = M_2PI * base_freq;
 	}
 	else if (46 <= cv->wave_stat)
 	{
 		pulse_Mode = Async;
-		double base_freq = (double)730 - 50.0 / 49.0 * (cv->wave_stat); //170.0/54.0*(cv->wave_stat);
+		double base_freq = (double)730 - 50.0 / 49.0 * (cv->wave_stat); // 170.0/54.0*(cv->wave_stat);
 		expect_saw_angle_freq = M_2PI * base_freq;
 	}
 	else if (cv->brake && cv->wave_stat <= 4)
@@ -655,7 +610,7 @@ char calculate_toubu_50050(Control_Values *cv)
 	else
 	{
 		pulse_Mode = Async;
-		double base_freq = (double)730 - 50.0 / 49.0 * (cv->wave_stat); //170.0/54.0*(cv->wave_stat);
+		double base_freq = (double)730 - 50.0 / 49.0 * (cv->wave_stat); // 170.0/54.0*(cv->wave_stat);
 		expect_saw_angle_freq = get_random_freq((int)base_freq, 100) * M_2PI;
 	}
 
@@ -901,7 +856,7 @@ char calculate_tokyu_9000_hitachi_gto(Control_Values *cv)
 	double amplitude = 0;
 	double expect_saw_angle_freq = 0;
 	Pulse_Mode pulse_mode = Async;
-	if (cv->brake) //settings for braking vvvf pattern
+	if (cv->brake) // settings for braking vvvf pattern
 	{
 		amplitude = get_Amplitude(cv->wave_stat, 60);
 		expect_saw_angle_freq = cv->wave_stat;
@@ -936,7 +891,7 @@ char calculate_tokyu_9000_hitachi_gto(Control_Values *cv)
 			return 0;
 		}
 	}
-	else //settings for accelerating vvvf pattern
+	else // settings for accelerating vvvf pattern
 	{
 		amplitude = get_Amplitude(cv->wave_stat, 45);
 		expect_saw_angle_freq = cv->wave_stat;
@@ -1052,13 +1007,13 @@ char calculate_tokyuu_5000(Control_Values *cv)
 		else if (50 <= cv->wave_stat)
 		{
 			pulse_Mode = Async;
-			double base_freq = (double)700 + 1100 / 11.0 * (cv->wave_stat - 50); //170.0/54.0*(cv->wave_stat);
+			double base_freq = (double)700 + 1100 / 11.0 * (cv->wave_stat - 50); // 170.0/54.0*(cv->wave_stat);
 			expect_saw_angle_freq = M_2PI * base_freq;
 		}
 		else if (23 <= cv->wave_stat)
 		{
 			pulse_Mode = Async;
-			double base_freq = (double)740 - 40.0 / (50 - 23) * (cv->wave_stat - 23); //170.0/54.0*(cv->wave_stat);
+			double base_freq = (double)740 - 40.0 / (50 - 23) * (cv->wave_stat - 23); // 170.0/54.0*(cv->wave_stat);
 			expect_saw_angle_freq = base_freq * M_2PI;
 		}
 		else if (cv->brake && cv->wave_stat <= 4)
@@ -1084,13 +1039,13 @@ char calculate_tokyuu_5000(Control_Values *cv)
 		else if (42 <= cv->wave_stat)
 		{
 			pulse_Mode = Async;
-			double base_freq = (double)700 + 1100 / 13.0 * (cv->wave_stat - 42); //170.0/54.0*(cv->wave_stat);
+			double base_freq = (double)700 + 1100 / 13.0 * (cv->wave_stat - 42); // 170.0/54.0*(cv->wave_stat);
 			expect_saw_angle_freq = M_2PI * base_freq;
 		}
 		else if (23 <= cv->wave_stat)
 		{
 			pulse_Mode = Async;
-			double base_freq = (double)740 - 40.0 / (46 - 23) * (cv->wave_stat - 23); //170.0/54.0*(cv->wave_stat);
+			double base_freq = (double)740 - 40.0 / (46 - 23) * (cv->wave_stat - 23); // 170.0/54.0*(cv->wave_stat);
 			expect_saw_angle_freq = base_freq * M_2PI;
 		}
 		else
@@ -1368,4 +1323,194 @@ char calculate_jre_209_mitsubishi_gto(Control_Values *cv)
 		}
 	}
 	return calculate_three_level(pulse_Mode, expect_saw_angle_freq, cv->initial_phase, amplitude, -1);
+}
+
+char calculate_keikyu_n1000_siemens_gto_2_level(Control_Values *cv)
+{
+	int a = 2, b = 3;
+	double k[2][3] = {
+		{0.0193294460641, 0.0222656250000, 0},
+		{0.014763975813, 0.018464, 0.013504901961},
+	};
+	double B[2][3] = {
+		{0.10000000000, -0.07467187500, 0},
+		{0.10000000000, -0.095166, 0.100000000000},
+	};
+
+	Pulse_Mode pulse_mode;
+	double expect_saw_angle_freq = 1;
+
+	if (!cv->brake)
+	{
+		if (80 <= cv->wave_stat)
+		{
+			pulse_mode = P_1;
+		}
+		else if (59 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 2;
+			pulse_mode = CHMP_Wide_3;
+		}
+		else if (cv->free_run && sin_angle_freq >= 57 * M_2PI)
+		{
+			pulse_mode = P_3;
+		}
+		else if (57 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 2;
+			pulse_mode = CHMP_Wide_5;
+		}
+		else if (53.5 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 2;
+			pulse_mode = CHMP_Wide_7;
+		}
+		else if (43.5 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 1;
+			pulse_mode = CHMP_7;
+		}
+		else if (36.7 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 1;
+			pulse_mode = CHMP_9;
+		}
+		else if (30 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 1;
+			pulse_mode = CHMP_11;
+		}
+		else if (27 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 1;
+			pulse_mode = CHMP_13;
+		}
+		else if (24 <= cv->wave_stat)
+		{
+			a = 1;
+			b = 1;
+			pulse_mode = CHMP_15;
+		}
+		else
+		{
+			a = 1;
+			b = 1;
+			double expect_saw_freq = 400;
+			pulse_mode = Async_THI;
+			if (5.6 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 5.6 * M_2PI))
+				expect_saw_freq = 400;
+			else if (5 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 5.0 * M_2PI))
+				expect_saw_freq = 350;
+			else if (4.3 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 4.3 * M_2PI))
+				expect_saw_freq = 311;
+			else if (3.4 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 3.4 * M_2PI))
+				expect_saw_freq = 294;
+			else if (2.7 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 2.7 * M_2PI))
+				expect_saw_freq = 262;
+			else if (2.0 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 2.0 * M_2PI))
+				expect_saw_freq = 233;
+			else if (1.5 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 1.5 * M_2PI))
+				expect_saw_freq = 223;
+			else if (0.5 <= cv->wave_stat || (cv->free_run && sin_angle_freq >= 0.5 * M_2PI))
+				expect_saw_freq = 196;
+			else
+				expect_saw_freq = 175;
+
+			expect_saw_angle_freq = expect_saw_freq * M_2PI;
+		}
+	}
+	else
+	{
+		if (79.5 <= cv->wave_stat)
+		{
+			pulse_mode = P_1;
+		}
+		else if (70.7 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 2;
+			pulse_mode = CHMP_Wide_3;
+		}
+		else if (cv->free_run && sin_angle_freq >= 63.35 * M_2PI)
+		{
+			pulse_mode = P_3;
+		}
+		else if (63.35 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 2;
+			pulse_mode = CHMP_Wide_5;
+		}
+		else if (56.84 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 2;
+			pulse_mode = CHMP_Wide_7;
+		}
+		else if (53.5 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 1;
+			pulse_mode = CHMP_7;
+		}
+		else if (41 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 3;
+			pulse_mode = CHMP_7;
+		}
+		else if (34.5 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 3;
+			pulse_mode = CHMP_9;
+		}
+		else if (28.9 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 3;
+			pulse_mode = CHMP_11;
+		}
+		else if (24.9 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 3;
+			pulse_mode = CHMP_13;
+		}
+		else if (22.4 <= cv->wave_stat)
+		{
+			a = 2;
+			b = 3;
+			pulse_mode = CHMP_15;
+		}
+		else if (cv->wave_stat > 4)
+		{
+			a = 2;
+			b = 3;
+			expect_saw_angle_freq = 400 * M_2PI;
+			pulse_mode = Async_THI;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	double amplitude =  ((k[a - 1][b - 1] * cv->wave_stat) + B[a - 1][b - 1]);
+	amplitude = amplitude >= 1.25 ? 1.25 : amplitude;
+
+	if (cv->free_run && amplitude < 0.498)
+		amplitude = 0;
+	if (cv->wave_stat == 0)
+		amplitude = 0;
+	if (pulse_mode == P_3)
+		amplitude /= 1.25;
+
+	return calculate_two_level(pulse_mode, expect_saw_angle_freq, cv->initial_phase, amplitude);
 }

@@ -41,8 +41,8 @@ char get_pwm_value(double sin_value, double saw_value)
 
 char get_Wide_P_3(double time, double angle_frequency, double initial_phase, double voltage, bool saw_oppose)
 {
-	double sin = get_sin_value(time, angle_frequency, initial_phase, 1);
-	double saw = get_saw_value(time, angle_frequency, initial_phase);
+	double sin = get_sin_value(time * angle_frequency + initial_phase, 1);
+	double saw = get_saw_value(time * angle_frequency + initial_phase);
 	if (saw_oppose)
 		saw = -saw;
 	double pwm = ((sin - saw > 0) ? 1 : -1) * voltage;
@@ -53,8 +53,8 @@ char get_Wide_P_3(double time, double angle_frequency, double initial_phase, dou
 
 char get_P_with_saw(double time, double sin_angle_frequency, double initial_phase, double voltage, double carrier_mul, bool saw_oppose)
 {
-	double carrier_saw = -get_saw_value(time, carrier_mul * sin_angle_frequency, carrier_mul * initial_phase);
-	double saw = -get_saw_value(time, sin_angle_frequency, initial_phase);
+	double carrier_saw = -get_saw_value(carrier_mul * ( sin_angle_frequency * time + initial_phase) );
+	double saw = -get_saw_value(time * sin_angle_frequency + initial_phase);
 	if (saw_oppose)
 		saw = -saw;
 	double pwm = (saw > 0) ? voltage : -voltage;
@@ -191,9 +191,9 @@ char calculate_three_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, 
 	}
 	saw_angle_freq = expect_saw_angle_freq;
 
-	double sin_value = get_sin_value(sin_time, sin_angle_freq, initial_phase, amplitude);
+	double sin_value = get_sin_value(sin_time * sin_angle_freq + initial_phase, amplitude);
 
-	double saw_value = get_saw_value(saw_time, saw_angle_freq, 0);
+	double saw_value = get_saw_value(saw_time * saw_angle_freq + initial_phase);
 	if ((int)pulse_mode > (int)P_61)
 		saw_value = -saw_value;
 
@@ -427,17 +427,18 @@ char calculate_two_level(Pulse_Mode pulse_mode, double expect_saw_angle_freq, do
 			M_PI_2,
 			'A', sin_time, sin_angle_freq, initial_phase);
 
-	if (pulse_mode == Async)
+	if (pulse_mode == Async || pulse_mode == Async_THI)
 	{
 		saw_time = saw_angle_freq / expect_saw_angle_freq * saw_time;
 		saw_angle_freq = expect_saw_angle_freq;
 
-		double sin_value = get_sin_value(sin_time * sin_angle_freq + initial_phase, amplitude);
+		double sin_value;
+		if (pulse_mode == Async_THI)
+			sin_value = get_sin_value(sin_time * sin_angle_freq + initial_phase, amplitude) + 0.2 * get_sin_value(3 * (sin_time * sin_angle_freq + initial_phase), amplitude);
+		else
+			sin_value = get_sin_value(sin_time * sin_angle_freq + initial_phase, amplitude);
 
 		double saw_value = get_saw_value(saw_time * saw_angle_freq + 0);
-		if ((int)pulse_mode > (int)P_61)
-			saw_value = -saw_value;
-
 		char pwm_value = get_pwm_value(sin_value, saw_value) << 1;
 
 		return pwm_value;
