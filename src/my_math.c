@@ -62,7 +62,7 @@ double sin(double radian)
     if (radian > M_PI)
         cycles = (long)(radian * M_1_PI);
     double pi_radian = radian - (double)cycles * M_PI;
-    int loc = (int)round((double)pi_radian * 636.3014624813976);
+    int loc = (int)(pi_radian * 636.3014624813976);
     double val = sin_table[loc];
     if (cycles & 0x01)
         val = -(double)val;

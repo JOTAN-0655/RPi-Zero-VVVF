@@ -2,7 +2,6 @@
 
 #define SETTINGS_H
 
-//#define ENABLE_MASCON_OFF
 //#define DISABLE_DEBUG_PIN
 //#define ENABLE_3_LEVEL
 

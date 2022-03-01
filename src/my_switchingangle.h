@@ -1,3 +1,6 @@
+#ifndef MY_SWITCHINGANGLE_H
+#define MY_SWITCHINGANGLE_H
+
 extern const double _7Alpha[1274][7];
 extern const double _7WideAlpha[275][7];
 extern const double _7Alpha_Old[1274][7];
@@ -27,3 +30,5 @@ extern const double _5Alpha_SHE[1271][5];
 extern const double _3Alpha_SHE[1274][3];
 extern const double _2Alpha_SHE[1274][2];
 extern const double _1Alpha_SHE[1274];
+
+#endif
